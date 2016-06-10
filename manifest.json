@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+  "name": "Focus",
+  "version": "0.1",
+
+  "description": "Implements tracking protection as a web extension add-on.",
+  "icons": {
+    "48": "icons/focus.jpg"
+  },
+
+  "applications": {
+    "gecko": {
+      "id": "lcrouch@mozilla.org",
+      "strict_min_version": "45.0"
+    }
+  },
+
+  "background": {
+    "scripts": ["blockTrackerRequests.js"]
+  },
+
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking"
+  ]
+
+}
