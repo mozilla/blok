@@ -21,7 +21,9 @@
 
   "page_action": {
     "default_icon": "icons/focus.png",
-    "default_title": "Focus"
+    "default_title": "Focus",
+    "default_popup": "popup.html",
+    "browser_style": true
   },
 
   "permissions": [

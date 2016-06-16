@@ -1,5 +1,15 @@
 var blocklist_url = 'disconnect-blocklist.json';
 var blocklist = {};
+var blocked_requests = [];
+var total_exec_time = 0;
+
+
+function restartFocus(tabID) {
+  chrome.pageAction.hide(tabID);
+  blocked_requests = [];
+  total_exec_time = 0;
+}
+
 
 function getJSON(url) {
   return new Promise(function(resolve, reject) {
@@ -18,38 +28,38 @@ function getJSON(url) {
   });
 }
 
+
 function blockTrackerRequests(requestDetails) {
     var blockTrackerRequestsStart = Date.now();
     // Allow all requests originating from new tab/window pages
     if (requestDetails.originUrl.includes('moz-nullprincipal')) {
-        var blockTrackerRequestsEnd = Date.now();
-        var execTime = blockTrackerRequestsEnd - blockTrackerRequestsStart;
-        console.log("blockTrackerRequests execTime: " + execTime);
+        total_exec_time += Date.now() - blockTrackerRequestsStart;
         return {};
     }
     // First check if the request url top host is in the blocklist at all
     var requestTopHost = new URL(requestDetails.url).host.split('.').slice(-2).join('.');
     if (!blocklist.hasOwnProperty(requestTopHost)) {
-        var blockTrackerRequestsEnd = Date.now();
-        var execTime = blockTrackerRequestsEnd - blockTrackerRequestsStart;
-        console.log("blockTrackerRequests execTime: " + execTime);
+        total_exec_time += Date.now() - blockTrackerRequestsStart;
         return {};
     }
-    console.log("requestTopHost: " + requestTopHost + " is in the blocklist. Check if this is a 3rd-party request ...");
 
     // Block if the request url top host doesn't match origin url top host (i.e., 3rd-party)
     var originTopHost = new URL(requestDetails.originUrl).host.split('.').slice(-2).join('.');
     if (requestTopHost != originTopHost) {
+      console.log("requestTopHost: " + requestTopHost + " does not match originTopHost: " + originTopHost + ". Blocking request.");
+
+      blocked_requests.push(blocklist[requestTopHost]);
+
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.pageAction.show(tabs[0].id);
       });
-      console.log("requestTopHost: " + requestTopHost + " does not match originTopHost: " + originTopHost + ". Blocking request.");
-      var blockTrackerRequestsEnd = Date.now();
-      var execTime = blockTrackerRequestsEnd - blockTrackerRequestsStart;
-      console.log("blockTrackerRequests execTime: " + execTime);
+
+      total_exec_time += Date.now() - blockTrackerRequestsStart;
+
       return {cancel: true};
     }
 }
+
 
 getJSON(blocklist_url).then(function(data) {
   // remove un-needed categories per disconnect
@@ -96,4 +106,16 @@ getJSON(blocklist_url).then(function(data) {
       {urls:["*://*/*"]},
       ["blocking"]
   );
+});
+
+
+chrome.tabs.onUpdated.addListener(function(tabID, changeInfo, tab) {
+  if (!changeInfo.url) {
+    return;
+  }
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    if (tabID == tabs[0].id) {
+      restartFocus(tabID);
+    }
+  });
 });
