@@ -5,7 +5,7 @@
 
   "description": "Implements tracking protection as a web extension add-on.",
   "icons": {
-    "48": "icons/focus.jpg"
+    "48": "icons/focus.png"
   },
 
   "applications": {
@@ -16,7 +16,12 @@
   },
 
   "background": {
-    "scripts": ["blockTrackerRequests.js"]
+    "scripts": ["focus.js"]
+  },
+
+  "page_action": {
+    "default_icon": "icons/focus.png",
+    "default_title": "Focus"
   },
 
   "permissions": [

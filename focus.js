@@ -19,13 +19,20 @@ function getJSON(url) {
 }
 
 function blockTrackerRequests(requestDetails) {
+    var blockTrackerRequestsStart = Date.now();
     // Allow all requests originating from new tab/window pages
     if (requestDetails.originUrl.includes('moz-nullprincipal')) {
+        var blockTrackerRequestsEnd = Date.now();
+        var execTime = blockTrackerRequestsEnd - blockTrackerRequestsStart;
+        console.log("blockTrackerRequests execTime: " + execTime);
         return {};
     }
     // First check if the request url top host is in the blocklist at all
     var requestTopHost = new URL(requestDetails.url).host.split('.').slice(-2).join('.');
     if (!blocklist.hasOwnProperty(requestTopHost)) {
+        var blockTrackerRequestsEnd = Date.now();
+        var execTime = blockTrackerRequestsEnd - blockTrackerRequestsStart;
+        console.log("blockTrackerRequests execTime: " + execTime);
         return {};
     }
     console.log("requestTopHost: " + requestTopHost + " is in the blocklist. Check if this is a 3rd-party request ...");
@@ -33,7 +40,13 @@ function blockTrackerRequests(requestDetails) {
     // Block if the request url top host doesn't match origin url top host (i.e., 3rd-party)
     var originTopHost = new URL(requestDetails.originUrl).host.split('.').slice(-2).join('.');
     if (requestTopHost != originTopHost) {
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.pageAction.show(tabs[0].id);
+      });
       console.log("requestTopHost: " + requestTopHost + " does not match originTopHost: " + originTopHost + ". Blocking request.");
+      var blockTrackerRequestsEnd = Date.now();
+      var execTime = blockTrackerRequestsEnd - blockTrackerRequestsStart;
+      console.log("blockTrackerRequests execTime: " + execTime);
       return {cancel: true};
     }
 }
