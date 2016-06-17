@@ -1,13 +1,15 @@
 var blocklist_url = 'disconnect-blocklist.json';
 var blocklist = {};
-var blocked_requests = [];
-var total_exec_time = 0;
+
+var current_active_tab_id;
+var blocked_requests = {};
+var total_exec_time = {};
 
 
 function restartFocus(tabID) {
   chrome.pageAction.hide(tabID);
-  blocked_requests = [];
-  total_exec_time = 0;
+  blocked_requests[tabID] = [];
+  total_exec_time[tabID] = 0;
 }
 
 
@@ -33,13 +35,13 @@ function blockTrackerRequests(requestDetails) {
     var blockTrackerRequestsStart = Date.now();
     // Allow all requests originating from new tab/window pages
     if (requestDetails.originUrl.includes('moz-nullprincipal')) {
-        total_exec_time += Date.now() - blockTrackerRequestsStart;
+        total_exec_time[current_active_tab_id] += Date.now() - blockTrackerRequestsStart;
         return {};
     }
     // First check if the request url top host is in the blocklist at all
     var requestTopHost = new URL(requestDetails.url).host.split('.').slice(-2).join('.');
     if (!blocklist.hasOwnProperty(requestTopHost)) {
-        total_exec_time += Date.now() - blockTrackerRequestsStart;
+        total_exec_time[current_active_tab_id] += Date.now() - blockTrackerRequestsStart;
         return {};
     }
 
@@ -47,14 +49,11 @@ function blockTrackerRequests(requestDetails) {
     var originTopHost = new URL(requestDetails.originUrl).host.split('.').slice(-2).join('.');
     if (requestTopHost != originTopHost) {
       console.log("requestTopHost: " + requestTopHost + " does not match originTopHost: " + originTopHost + ". Blocking request.");
+      blocked_requests[current_active_tab_id].push(requestTopHost);
+      console.log("blocked_requests: " + blocked_requests[current_active_tab_id]);
 
-      blocked_requests.push(blocklist[requestTopHost]);
-
-      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.pageAction.show(tabs[0].id);
-      });
-
-      total_exec_time += Date.now() - blockTrackerRequestsStart;
+      total_exec_time[current_active_tab_id] += Date.now() - blockTrackerRequestsStart;
+      console.log("total_exec_time: " + total_exec_time[current_active_tab_id]);
 
       return {cancel: true};
     }
@@ -109,13 +108,20 @@ getJSON(blocklist_url).then(function(data) {
 });
 
 
+chrome.tabs.onActivated.addListener(function(activeInfo) {
+  current_active_tab_id = activeInfo.tabId;
+});
+
 chrome.tabs.onUpdated.addListener(function(tabID, changeInfo, tab) {
-  if (!changeInfo.url) {
-    return;
-  }
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    if (tabID == tabs[0].id) {
-      restartFocus(tabID);
+  if (changeInfo.status == "loading") {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      if (tabID == tabs[0].id) {
+        restartFocus(tabID);
+      }
+    });
+  } else if (changeInfo.status == "complete") {
+    if (blocked_requests[current_active_tab_id].length > 0) {
+      chrome.pageAction.show(current_active_tab_id);
     }
-  });
+  }
 });

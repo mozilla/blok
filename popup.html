@@ -6,6 +6,7 @@
     <link rel="icon" type="image/png" href="icons/focus.png">
     <link rel="stylesheet" href="css/foundation.min.css">
     <link rel="stylesheet" href="css/fira.css">
+    <link rel="stylesheet" href="css/popup.css">
   </head>
   <body>
   <div class="top-bar">
@@ -13,8 +14,16 @@
       <img src="img/banner.png">
     </div>
   </div>
+  <hr/>
   <div class="row">
-    Blocked at least 1 request.
+    Blocked <span id="blocked_requests_count"></span> request(s):
   </div>
+  <form>
+    <label>Is the page broken?
+      <textarea id="page_broken_text" name="page_broken_text" rows="2"></textarea>
+    </label>
+    <input type="submit" class="button expanded" value="Submit"></input>
+  </form>
   </body>
+  <script src="popup.js"></script>
 </html>
