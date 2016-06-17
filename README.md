@@ -1,3 +1,4 @@
+![Screenshot](https://raw.githubusercontent.com/groovecoder/focus-addon/master/img/screenshot.png)
 # focus-addon
 [Web Extension](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/) re-implementation of [Tracking Protection for Firefox](https://support.mozilla.org/en-US/kb/tracking-protection-pbm).
 
