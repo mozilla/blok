@@ -19,3 +19,5 @@ When we have breakage data and user feedback, we will change the tracking protec
 2. Go to `about:debugging`
 3. Click "Load Temporary Add-on"
 4. Select this repo `manifest.json` file
+
+When the add-on blocks tracker requests, you will see a Focus icon appear in the location bar. Click on it to see information about what was blocked.
