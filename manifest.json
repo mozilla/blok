@@ -1,11 +1,11 @@
 {
   "manifest_version": 2,
-  "name": "Focus",
+  "name": "Blok",
   "version": "0.1",
 
   "description": "Implements tracking protection as a web extension add-on.",
   "icons": {
-    "48": "icons/focus.png"
+    "48": "icons/blok.png"
   },
 
   "applications": {
@@ -16,12 +16,12 @@
   },
 
   "background": {
-    "scripts": ["focus.js"]
+    "scripts": ["blok.js"]
   },
 
   "page_action": {
-    "default_icon": "icons/focus.png",
-    "default_title": "Focus",
+    "default_icon": "icons/blok.png",
+    "default_title": "Blok",
     "default_popup": "popup.html",
     "browser_style": true
   },
