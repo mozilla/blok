@@ -1,5 +1,5 @@
-![Screenshot](https://raw.githubusercontent.com/groovecoder/focus-addon/master/img/screenshot.png)
-# focus-addon
+![Screenshot](https://raw.githubusercontent.com/groovecoder/blok/master/img/screenshot.png)
+# Blok
 [Web Extension](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/) re-implementation of [Tracking Protection for Firefox](https://support.mozilla.org/en-US/kb/tracking-protection-pbm).
 
 We will run this add-on thru [Test Pilot experimentation](https://testpilot.firefox.com/experiments) to:
@@ -20,4 +20,4 @@ When we have breakage data and user feedback, we will change the tracking protec
 3. Click "Load Temporary Add-on"
 4. Select this repo `manifest.json` file
 
-When the add-on blocks tracker requests, you will see a Focus icon appear in the location bar. Click on it to see information about what was blocked.
+When the add-on blocks tracker requests, you will see a Blok icon appear in the location bar. Click on it to see information about what was blocked.

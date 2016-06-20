@@ -6,7 +6,7 @@ var blocked_requests = {};
 var total_exec_time = {};
 
 
-function restartFocus(tabID) {
+function restartBlok(tabID) {
   chrome.pageAction.hide(tabID);
   blocked_requests[tabID] = [];
   total_exec_time[tabID] = 0;
@@ -116,7 +116,7 @@ chrome.tabs.onUpdated.addListener(function(tabID, changeInfo, tab) {
   if (changeInfo.status == "loading") {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       if (tabID == tabs[0].id) {
-        restartFocus(tabID);
+        restartBlok(tabID);
       }
     });
   } else if (changeInfo.status == "complete") {
