@@ -4,6 +4,7 @@ var blocklist = {};
 var current_active_tab_id;
 var blocked_requests = {};
 var total_exec_time = {};
+var disabled_tabs = [];
 
 
 function restartBlok(tabID) {
@@ -33,6 +34,12 @@ function getJSON(url) {
 
 function blockTrackerRequests(requestDetails) {
     var blockTrackerRequestsStart = Date.now();
+    // Allow all requests if protection for this tab has been disabled
+    if (disabled_tabs.find(id => id == current_active_tab_id)) {
+      console.log("Protection disabled for this tab; allowing request.");
+      return {};
+    }
+
     // Allow all requests originating from new tab/window pages
     if (requestDetails.originUrl.includes('moz-nullprincipal')) {
         total_exec_time[current_active_tab_id] += Date.now() - blockTrackerRequestsStart;
@@ -112,16 +119,17 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
   current_active_tab_id = activeInfo.tabId;
 });
 
-chrome.tabs.onUpdated.addListener(function(tabID, changeInfo, tab) {
+chrome.tabs.onUpdated.addListener(function(tabID, changeInfo) {
   if (changeInfo.status == "loading") {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      current_active_tab_id = tabs[0].id;
+      // TODO: when the user goes to a new domain in the tab,
+      // remove the tabID from disabled_tabs,
+      // so protection is re-enabled on the new domain
+      restartBlok(current_active_tab_id);
       if (tabID == tabs[0].id) {
-        restartBlok(tabID);
+        chrome.pageAction.show(current_active_tab_id);
       }
     });
-  } else if (changeInfo.status == "complete") {
-    if (blocked_requests[current_active_tab_id].length > 0) {
-      chrome.pageAction.show(current_active_tab_id);
-    }
   }
 });

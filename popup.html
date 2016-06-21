@@ -9,21 +9,16 @@
     <link rel="stylesheet" href="css/popup.css">
   </head>
   <body>
-  <div class="top-bar">
-    <div class="top-bar-title">
-      <img src="img/banner.png">
-    </div>
+  <div id="details" class="row">
+    <img id="banner" src="img/banner.png">
+    <p id="blocking_summary">Blocked <span id="blocked_requests_count"></span> request(s) on the page that may track your browsing.</p>
+    <input id="disable_btn" class="button expanded" value="Disable blocking for this tab"></input>
   </div>
-  <hr/>
-  <div class="row">
-    Blocked <span id="blocked_requests_count"></span> request(s):
+  <div id="disabled_reason_buttons" class="hide">
+    <input class="button expanded" value="The page was broken"></input>
+    <input class="button expanded" value="I wanted to allow tracking on this page"></input>
+    <input class="button expanded" value="Other"></input>
   </div>
-  <form>
-    <label>Is the page broken?
-      <textarea id="page_broken_text" name="page_broken_text" rows="2"></textarea>
-    </label>
-    <input type="submit" class="button expanded" value="Submit"></input>
-  </form>
   </body>
   <script src="popup.js"></script>
 </html>
