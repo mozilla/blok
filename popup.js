@@ -6,8 +6,8 @@ browser.runtime.getBackgroundPage(function(backgroundPage) {
   var current_tab_disabled_index = disabled_tabs.indexOf(current_active_tab_id);
 
   if (current_tab_disabled_index > -1) {
-    document.querySelector("#blocking_summary").innerHTML = "Blocking disabled for this tab";
-    document.querySelector("#disable_btn").value = "Re-enable blocking for this tab";
+    document.querySelector("#blocking_summary").innerHTML = "Blocking disabled for this site in this tab";
+    document.querySelector("#disable_btn").value = "Re-enable blocking for this site in this tab";
     document.querySelector("#disable_btn").addEventListener("click", function(){
       disabled_tabs.splice(current_tab_disabled_index, 1);
       browser.tabs.reload(current_active_tab_id);
@@ -22,17 +22,45 @@ browser.runtime.getBackgroundPage(function(backgroundPage) {
       document.querySelector("#details").className = "row hide";
     });
   }
-  document.querySelector(".reason").addEventListener("click", function(event){
-    fetch('https://testpilot.firefox.com/api/metrics/ping/testpilottest',
-      {
-        method: 'POST',
-        mode: 'cors',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-        })
-      }
-    )
-    .then(resp => console.log('metric ping success', resp))
-    .catch(e => console.log('problem sending metrics ping', e));
-  });
+  for (reasonElement of document.querySelectorAll(".reason")) {
+    reasonElement.addEventListener("click", function(event){
+      // Send the reason to some metrics/telemetry/analytics pipeline
+      /*
+       * https://github.com/mozilla/testpilot/pull/952 would be:
+
+      fetch('https://testpilot.firefox.com/api/metrics/ping/testpilottest',
+        {
+          method: 'POST',
+          mode: 'cors',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+          })
+        }
+      )
+      .then(resp => {
+        console.log('metric ping success', resp)
+      })
+      .catch(e => {
+        console.log('problem sending metrics ping', e)
+      });
+
+
+       * https://github.com/mozilla/testpilot/pull/1008 would be:
+
+
+      document.getElementById('tp-proxy').contentWindow.postMessage({
+        op: 'queueTelemetryPing',
+        data: {
+          subject: 'tracking-protection-experiment',
+          data: {
+            originTopHost: ..,
+            reason: ..
+          }
+        }
+      }, '*');
+
+      */
+      window.close();
+    });
+  }
 });
