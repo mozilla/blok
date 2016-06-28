@@ -1,22 +1,25 @@
 browser.runtime.getBackgroundPage(function(backgroundPage) {
   var current_active_tab_id = backgroundPage.current_active_tab_id;
+  var current_active_origin = backgroundPage.current_active_origin;
   var blocked_requests = backgroundPage.blocked_requests;
   var blocked_requests_count = blocked_requests[current_active_tab_id].length;
-  var disabled_tabs = backgroundPage.disabled_tabs;
-  var current_tab_disabled_index = disabled_tabs.indexOf(current_active_tab_id);
+  var allowedHosts = backgroundPage.allowedHosts;
+  var current_origin_disabled_index = allowedHosts.indexOf(current_active_origin);
 
-  if (current_tab_disabled_index > -1) {
-    document.querySelector("#blocking_summary").innerHTML = "Blocking disabled for this site in this tab";
+  if (current_origin_disabled_index > -1) {
+    document.querySelector("#blocking_summary").innerHTML = "Blocking disabled for this site";
     document.querySelector("#disable_btn").value = "Re-enable blocking for this site in this tab";
     document.querySelector("#disable_btn").addEventListener("click", function(){
-      disabled_tabs.splice(current_tab_disabled_index, 1);
+      allowedHosts.splice(current_origin_disabled_index, 1);
+      browser.storage.local.set({allowedHosts: allowedHosts});
       browser.tabs.reload(current_active_tab_id);
       window.close();
     });
   } else {
     document.querySelector("#blocked_requests_count").innerHTML = blocked_requests_count;
     document.querySelector("#disable_btn").addEventListener("click", function(){
-      disabled_tabs.push(current_active_tab_id);
+      allowedHosts.push(current_active_origin);
+      browser.storage.local.set({allowedHosts: allowedHosts});
       browser.tabs.reload(current_active_tab_id);
       document.querySelector("#disabled_reason_buttons").className = "";
       document.querySelector("#details").className = "row hide";
