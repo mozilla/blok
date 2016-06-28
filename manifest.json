@@ -27,6 +27,7 @@
   },
 
   "permissions": [
+    "storage",
     "webRequest",
     "webRequestBlocking"
   ]
