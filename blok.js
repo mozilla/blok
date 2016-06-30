@@ -9,7 +9,6 @@ var total_exec_time = {};
 
 
 function restartBlokForTab(tabID) {
-  chrome.pageAction.hide(tabID);
   blocked_requests[tabID] = [];
   total_exec_time[tabID] = 0;
 }
@@ -122,7 +121,7 @@ function blockTrackerRequests(requestDetails) {
 
       total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
       console.log("total_exec_time: " + total_exec_time[requestTabID]);
-      chrome.pageAction.show(requestTabID);
+      chrome.tabs.executeScript(requestTabID, {code: 'alert(\'Blocked \' + backgroundPage.blocked_requests.length + \' requests\')'});
 
       return {cancel: true};
     }

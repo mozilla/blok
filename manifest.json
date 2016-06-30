@@ -19,13 +19,6 @@
     "scripts": ["blok.js"]
   },
 
-  "page_action": {
-    "default_icon": "icons/blok.png",
-    "default_title": "Blok",
-    "default_popup": "popup.html",
-    "browser_style": true
-  },
-
   "permissions": [
     "storage",
     "webRequest",
