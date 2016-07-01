@@ -1,3 +1,6 @@
+var TESTPILOT_TELEMETRY_CHANNEL = 'testpilot-telemetry';
+var testpilotPingChannel = new BroadcastChannel(TESTPILOT_TELEMETRY_CHANNEL);
+
 var blocklist = {};
 var allowedHosts = [];
 
@@ -162,4 +165,17 @@ Promise.all([getBlocklistJSON, getAllowedHosts]).then(function(values) {
       restartBlokForTab(tabID);
     }
   });
+});
+
+chrome.runtime.onMessage.addListener(function (message) {
+  if (message == "close-toolbar") {
+    chrome.tabs.sendMessage(current_active_tab_id, 'close-toolbar');
+  }
+  if (message.hasOwnProperty('disable-reason')) {
+    testpilotPingChannel.postMessage({
+      originDomain: current_active_origin,
+      trackerDomains: blocked_requests[current_active_tab_id],
+      reason: message.disable-reason
+    });
+  }
 });

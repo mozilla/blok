@@ -1,8 +1,14 @@
 var toolbarFrame;
 
 if (window.parent == window) {
-  chrome.runtime.onMessage.addListener(function (runtimeMessage) {
-    toolbarFrame = document.getElementById('blok-toolbar-iframe');
+  toolbarFrame = document.getElementById('blok-toolbar-iframe');
+
+  chrome.runtime.onMessage.addListener(function (message) {
+    if (message == "close-toolbar") {
+      document.querySelector('#blok-toolbar-spacer').remove();
+      toolbarFrame.remove();
+      return;
+    }
 
     if (!toolbarFrame) {
       var toolbarSpacer = document.createElement("div");
