@@ -16,13 +16,26 @@
   },
 
   "background": {
-    "scripts": ["blok.js"]
+    "scripts": ["js/background.js"]
   },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["/js/contentscript.js"],
+      "css": ["/css/contentscript.css"],
+      "run_at": "document_start"
+    }
+  ],
 
   "permissions": [
     "storage",
     "webRequest",
     "webRequestBlocking"
+  ],
+
+  "web_accessible_resources": [
+    "toolbar.html"
   ]
 
 }

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/foundation.min.css">
+    <link rel="stylesheet" href="css/foundation-icons.css">
+    <link rel="stylesheet" href="css/toolbar.css">
+  </head>
+
+  <body>
+
+    <div class="row">
+      <div class="medium-6 columns">
+        <img id="blok-icon" class="blok-icon" src="icons/blok.png" alt="Blok icon">
+        <span id="title">Blocked <span id="block-count"></span> request(s)</span>
+      </div>
+      <div class="medium-6 columns text-right">
+        <div id="disable">
+          <a id="disable-btn" class="tiny alert button">Disable blocking</a>
+          <a class="tiny secondary hollow button close-btn"><i class="fi-x">&nbsp;</i></a>
+        </div>
+        <div id="disable-reasons" class="hide">
+          <a id="disable-reason-broken" class="tiny button reason">Broken</a>
+          <a id="disable-reason-allow" class="tiny button reason">Allow</a>
+          <a class="tiny secondary hollow button close-btn"><i class="fi-x">&nbsp;</i></a>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/toolbar.js"></script>
+
+  </body>
+</html>
