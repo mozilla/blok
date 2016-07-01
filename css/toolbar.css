@@ -13,3 +13,7 @@ body {
   width: 18px;
   height: 18px;
 }
+
+.button {
+  margin: 0;
+}

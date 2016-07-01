@@ -6,6 +6,7 @@ var allowedHosts = [];
 
 // HACK: Start with active tab id = 1 when browser starts
 var current_active_tab_id = 1;
+var current_origin_disabled_index = -1;
 var current_active_origin;
 var blocked_requests = {};
 var total_exec_time = {};
@@ -89,7 +90,6 @@ function blockTrackerRequests(requestDetails) {
     var blockTrackerRequestsStart = Date.now();
     var requestTabID = requestDetails.tabId;
     var originTopHost, requestTopHost;
-    var current_origin_disabled_index
 
     // Start with all origin flags false
     var currentOriginDisabled = false;
@@ -98,15 +98,11 @@ function blockTrackerRequests(requestDetails) {
 
     var requestHostInBlocklist = false;
 
-    if (typeof requestDetails.originUrl == "undefined") {
-      return {}
-    }
-
+    // Determine all origin flags
     originTopHost = new URL(requestDetails.originUrl).host.split('.').slice(-2).join('.');
     current_active_origin = originTopHost;
     current_origin_disabled_index = allowedHosts.indexOf(current_active_origin);
     
-    // Determine all origin flags
     currentOriginDisabled = current_origin_disabled_index > -1;
     firefoxOrigin = (typeof originTopHost !== "undefined" && originTopHost.includes('moz-nullprincipal'));
     newOrigin = originTopHost == '';
@@ -114,6 +110,7 @@ function blockTrackerRequests(requestDetails) {
     // Allow request if the origin has been added to allowedHosts
     if (currentOriginDisabled) {
       console.log("Protection disabled for this site; allowing request.");
+      chrome.tabs.sendMessage(requestTabID, {'origin-disabled': originTopHost});
       return {};
     }
 
@@ -170,6 +167,16 @@ Promise.all([getBlocklistJSON, getAllowedHosts]).then(function(values) {
 chrome.runtime.onMessage.addListener(function (message) {
   if (message == "close-toolbar") {
     chrome.tabs.sendMessage(current_active_tab_id, 'close-toolbar');
+  }
+  if (message == "disable") {
+    allowedHosts.push(current_active_origin);
+    browser.storage.local.set({allowedHosts: allowedHosts});
+    browser.tabs.reload(current_active_tab_id);
+  }
+  if (message == "re-enable") {
+    allowedHosts.splice(current_origin_disabled_index, 1);
+    browser.storage.local.set({allowedHosts: allowedHosts});
+    browser.tabs.reload(current_active_tab_id);
   }
   if (message.hasOwnProperty('disable-reason')) {
     testpilotPingChannel.postMessage({
