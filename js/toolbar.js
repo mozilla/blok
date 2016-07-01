@@ -21,9 +21,11 @@ document.querySelector('#re-enable-btn').addEventListener('click', function (eve
   chrome.runtime.sendMessage("re-enable");
 });
 
-document.querySelector('.close-btn').addEventListener('click', function (event) {
-  chrome.runtime.sendMessage("close-toolbar");
-});
+for (closeBtn of document.querySelectorAll('.close-btn')) {
+  closeBtn.addEventListener('click', function (event) {
+    chrome.runtime.sendMessage("close-toolbar");
+  });
+}
 
 for (reasonBtn of document.querySelectorAll('.reason')) {
   reasonBtn.addEventListener('click', function (event) {
