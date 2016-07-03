@@ -2,14 +2,13 @@ chrome.runtime.onMessage.addListener(function (runtimeMessage) {
   var blockedCount, blockedForm;
   if (runtimeMessage.hasOwnProperty('origin-disabled')) {
     document.querySelector('#title-blocking').className = 'hide';
-    document.querySelector('#title-disabled').className = '';
+    document.querySelector('#title-disabled').className = 'title';
     document.querySelector('#title-origin').innerHTML = runtimeMessage['origin-disabled'];
     document.querySelector('#disable').className = 'hide';
     document.querySelector('#disable-reasons').className = '';
   } else {
     blockedCount = runtimeMessage.blocked_requests.length;
-    blockedForm = blockedCount > 1 ? "requests" : "request";
-    document.querySelector('#title-block-count').innerHTML = blockedCount + " " + blockedForm;
+    document.querySelector('#title-block-count').innerHTML = blockedCount;
   }
 });
 
