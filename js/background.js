@@ -1,15 +1,18 @@
+var TESTPILOT_TELEMETRY_CHANNEL = 'testpilot-telemetry';
+var testpilotPingChannel = new BroadcastChannel(TESTPILOT_TELEMETRY_CHANNEL);
+
 var blocklist = {};
 var allowedHosts = [];
 
 // HACK: Start with active tab id = 1 when browser starts
 var current_active_tab_id = 1;
+var current_origin_disabled_index = -1;
 var current_active_origin;
 var blocked_requests = {};
 var total_exec_time = {};
 
 
 function restartBlokForTab(tabID) {
-  chrome.pageAction.hide(tabID);
   blocked_requests[tabID] = [];
   total_exec_time[tabID] = 0;
 }
@@ -86,35 +89,47 @@ var getAllowedHosts = new Promise(function(resolve, reject) {
 function blockTrackerRequests(requestDetails) {
     var blockTrackerRequestsStart = Date.now();
     var requestTabID = requestDetails.tabId;
-    console.log("requestTabID: " + requestTabID);
     var originTopHost, requestTopHost;
-    if (requestDetails.hasOwnProperty('originUrl')) {
-      originTopHost = new URL(requestDetails.originUrl).host.split('.').slice(-2).join('.');
-    }
-    var requestTopHost = new URL(requestDetails.url).host.split('.').slice(-2).join('.');
 
+    // Start with all origin flags false
+    var currentOriginDisabled = false;
+    var firefoxOrigin = false;
+    var newOrigin = false;
+
+    var requestHostInBlocklist = false;
+
+    // Determine all origin flags
+    originTopHost = new URL(requestDetails.originUrl).host.split('.').slice(-2).join('.');
     current_active_origin = originTopHost;
-    var current_origin_disabled_index = allowedHosts.indexOf(current_active_origin);
+    current_origin_disabled_index = allowedHosts.indexOf(current_active_origin);
+    
+    currentOriginDisabled = current_origin_disabled_index > -1;
+    firefoxOrigin = (typeof originTopHost !== "undefined" && originTopHost.includes('moz-nullprincipal'));
+    newOrigin = originTopHost == '';
 
     // Allow request if the origin has been added to allowedHosts
-    if (current_origin_disabled_index > -1) {
+    if (currentOriginDisabled) {
       console.log("Protection disabled for this site; allowing request.");
+      chrome.tabs.sendMessage(requestTabID, {'origin-disabled': originTopHost});
       return {};
     }
 
-    // Allow request originating from Firefox new tab/window pages
-    if (requestDetails.originUrl.includes('moz-nullprincipal')) {
+    // Allow request originating from Firefox and/or new tab/window origins
+    if (firefoxOrigin || newOrigin) {
         total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
         return {};
     }
+
+    requestTopHost = new URL(requestDetails.url).host.split('.').slice(-2).join('.');
+    requestHostInBlocklist = blocklist.hasOwnProperty(requestTopHost);
 
     // Allow requests to 3rd-party domains NOT in the block-list
-    if (!blocklist.hasOwnProperty(requestTopHost)) {
+    if (!requestHostInBlocklist) {
         total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
         return {};
     }
 
-    // Block if the request url top host doesn't match origin url top host (i.e., 3rd-party)
+    // Block if the request host is 3rd-party
     if (requestTopHost != originTopHost) {
       console.log("requestTopHost: " + requestTopHost + " does not match originTopHost: " + originTopHost + ". Blocking request.");
       blocked_requests[requestTabID].push(requestTopHost);
@@ -122,7 +137,9 @@ function blockTrackerRequests(requestDetails) {
 
       total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
       console.log("total_exec_time: " + total_exec_time[requestTabID]);
-      chrome.pageAction.show(requestTabID);
+      chrome.tabs.sendMessage(requestTabID, {
+        blocked_requests: blocked_requests[requestTabID]
+      });
 
       return {cancel: true};
     }
@@ -135,15 +152,37 @@ Promise.all([getBlocklistJSON, getAllowedHosts]).then(function(values) {
       {urls:["*://*/*"]},
       ["blocking"]
   );
+
+  chrome.tabs.onActivated.addListener(function(activeInfo) {
+    current_active_tab_id = activeInfo.tabId;
+  });
+
+  chrome.tabs.onUpdated.addListener(function(tabID, changeInfo) {
+    if (changeInfo.status == "loading") {
+      restartBlokForTab(tabID);
+    }
+  });
 });
 
-
-chrome.tabs.onActivated.addListener(function(activeInfo) {
-  current_active_tab_id = activeInfo.tabId;
-});
-
-chrome.tabs.onUpdated.addListener(function(tabID, changeInfo) {
-  if (changeInfo.status == "loading") {
-    restartBlokForTab(tabID);
+chrome.runtime.onMessage.addListener(function (message) {
+  if (message == "close-toolbar") {
+    chrome.tabs.sendMessage(current_active_tab_id, 'close-toolbar');
+  }
+  if (message == "disable") {
+    allowedHosts.push(current_active_origin);
+    browser.storage.local.set({allowedHosts: allowedHosts});
+    browser.tabs.reload(current_active_tab_id);
+  }
+  if (message == "re-enable") {
+    allowedHosts.splice(current_origin_disabled_index, 1);
+    browser.storage.local.set({allowedHosts: allowedHosts});
+    browser.tabs.reload(current_active_tab_id);
+  }
+  if (message.hasOwnProperty('disable-reason')) {
+    testpilotPingChannel.postMessage({
+      originDomain: current_active_origin,
+      trackerDomains: blocked_requests[current_active_tab_id],
+      reason: message.disable-reason
+    });
   }
 });

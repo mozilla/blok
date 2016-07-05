@@ -16,20 +16,26 @@
   },
 
   "background": {
-    "scripts": ["blok.js"]
+    "scripts": ["js/background.js"]
   },
 
-  "page_action": {
-    "default_icon": "icons/blok.png",
-    "default_title": "Blok",
-    "default_popup": "popup.html",
-    "browser_style": true
-  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["/js/contentscript.js"],
+      "css": ["/css/contentscript.css"],
+      "run_at": "document_start"
+    }
+  ],
 
   "permissions": [
     "storage",
     "webRequest",
     "webRequestBlocking"
+  ],
+
+  "web_accessible_resources": [
+    "toolbar.html"
   ]
 
 }
