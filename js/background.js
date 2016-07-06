@@ -112,7 +112,12 @@ function blockTrackerRequests(requestDetails) {
     // Allow request if the origin has been added to allowedHosts
     if (currentOriginDisabled) {
       console.log("Protection disabled for this site; allowing request.");
-      chrome.tabs.sendMessage(requestTabID, {'origin-disabled': originTopHost});
+      chrome.tabs.sendMessage(requestTabID,
+          {
+            'origin-disabled': originTopHost,
+            'reason-given': reasons_given[requestTabID]
+          }
+      );
       return {};
     }
 
