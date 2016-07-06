@@ -29,5 +29,7 @@ for (closeBtn of document.querySelectorAll('.close-btn')) {
 for (reasonBtn of document.querySelectorAll('.reason')) {
   reasonBtn.addEventListener('click', function (event) {
     chrome.runtime.sendMessage({"disable-reason": event.target.value});
+    document.querySelector('#disable-reasons').className = 'hide';
+    document.querySelector('#disable-reason-thankyou').className = '';
   });
 }

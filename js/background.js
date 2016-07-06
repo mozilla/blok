@@ -10,11 +10,13 @@ var current_origin_disabled_index = -1;
 var current_active_origin;
 var blocked_requests = {};
 var total_exec_time = {};
+var reasons_given = {};
 
 
 function restartBlokForTab(tabID) {
   blocked_requests[tabID] = [];
   total_exec_time[tabID] = 0;
+  reasons_given[tabID] = null;
 }
 
 
@@ -79,7 +81,7 @@ var getAllowedHosts = new Promise(function(resolve, reject) {
     if (Object.keys(item).length === 0) {
       allowedHosts = [];
     } else {
-      allowedHosts = item;
+      allowedHosts = item.allowedHosts;
     }
     resolve(allowedHosts);
   });
@@ -182,7 +184,8 @@ chrome.runtime.onMessage.addListener(function (message) {
     testpilotPingChannel.postMessage({
       originDomain: current_active_origin,
       trackerDomains: blocked_requests[current_active_tab_id],
-      reason: message.disable-reason
+      reason: message['disable-reason']
     });
+    reasons_given[current_active_tab_id] = message['disable-reason'];
   }
 });
