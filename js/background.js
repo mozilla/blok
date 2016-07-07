@@ -20,6 +20,34 @@ function restartBlokForTab(tabID) {
 }
 
 
+// like trim() helper from underscore.string:
+// trims chars from beginning and end of str
+function trim(str, chars) {
+  // escape any regexp chars
+  chars = chars.replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
+  return str.replace(new RegExp('^' + chars + '+|' + chars + '+$', 'g'), '');
+}
+
+
+// https://developers.google.com/safe-browsing/v4/urls-hashing#canonicalization
+function canonicalizeHost(host) {
+  // Remove all leading and trailing dots
+  var canonicalizedHost = trim(host, '.');
+
+  // Replace consecutive dots with a single dot
+  canonicalizedHost = canonicalizedHost.replace(new RegExp('[\.+]'), '.');
+
+  // TODO: If the hostname can be parsed as an IP address,
+  // normalize it to 4 dot-separated decimal values.
+  // The client should handle any legal IP-address encoding,
+  // including octal, hex, and fewer than four components
+
+  // Lowercase the whole string
+  canonicalizedHost = canonicalizedHost.toLowerCase();
+  return canonicalizedHost;
+}
+
+
 var getBlocklistJSON = new Promise(function(resolve, reject) {
     var xhr = new XMLHttpRequest();
     xhr.open('get', 'disconnect-blocklist.json', true);
@@ -101,7 +129,7 @@ function blockTrackerRequests(requestDetails) {
     var requestHostInBlocklist = false;
 
     // Determine all origin flags
-    originTopHost = new URL(requestDetails.originUrl).host.split('.').slice(-2).join('.');
+    originTopHost = canonicalizeHost(new URL(requestDetails.originUrl).host);
     current_active_origin = originTopHost;
     current_origin_disabled_index = allowedHosts.indexOf(current_active_origin);
     
@@ -127,7 +155,7 @@ function blockTrackerRequests(requestDetails) {
         return {};
     }
 
-    requestTopHost = new URL(requestDetails.url).host.split('.').slice(-2).join('.');
+    requestTopHost = canonicalizeHost(new URL(requestDetails.url).host);
     requestHostInBlocklist = blocklist.hasOwnProperty(requestTopHost);
 
     // Allow requests to 3rd-party domains NOT in the block-list
