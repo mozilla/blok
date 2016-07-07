@@ -5,7 +5,11 @@ chrome.runtime.onMessage.addListener(function (runtimeMessage) {
     document.querySelector('#title-disabled').className = 'title';
     document.querySelector('#title-origin').innerHTML = runtimeMessage['origin-disabled'];
     document.querySelector('#disable').className = 'hide';
-    document.querySelector('#disable-reasons').className = '';
+    if (runtimeMessage.hasOwnProperty('reason-given') && runtimeMessage['reason-given'] != null) {
+      document.querySelector('#disable-reason-thankyou').className = '';
+    } else {
+      document.querySelector('#disable-reasons').className = '';
+    }
   } else {
     blockedCount = runtimeMessage.blocked_requests.length;
     document.querySelector('#title-block-count').innerHTML = blockedCount;
@@ -28,6 +32,8 @@ for (closeBtn of document.querySelectorAll('.close-btn')) {
 
 for (reasonBtn of document.querySelectorAll('.reason')) {
   reasonBtn.addEventListener('click', function (event) {
-    chrome.runtime.sendMessage({"disable-reason": event.target.value});
+    chrome.runtime.sendMessage({"disable-reason": event.target.text});
+    document.querySelector('#disable-reasons').className = 'hide';
+    document.querySelector('#disable-reason-thankyou').className = '';
   });
 }
