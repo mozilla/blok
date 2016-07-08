@@ -11,13 +11,31 @@ When we have breakage data and user feedback, we will change the tracking protec
 
 ## Requirements
 
-* Firefox 48+ for [Web Extensions WebRequest.onBeforeRequest details](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/WebRequest/onBeforeRequest#details) `originUrl` property
+* Firefox 48+
 
-## Testing/Usage (for now)
+## Run it
+
+1. Go to `about:config` and set `xpinstall.signatures.required` to `false`
+2. [Download the `.xpi`](https://github.com/mozilla/blok/raw/master/web-ext-artifacts/blok-0.1.xpi)
+3. In Firefox, "Open File" and select the `.xpi`
+
+When the add-on blocks tracker requests, you will see a Blok notification bar
+like the screenshot.
+
+## Development
+
+### With `web-ext`
+
+1. Clone this repo locally
+2. [Install `web-ext`](https://github.com/mozilla/web-ext/#documentation) if
+   you haven't already
+3. `cd blok`
+4. `web-ext run`
+    
+
+### Without `web-ext`
 
 1. Clone this repo locally
 2. Go to `about:debugging`
 3. Click "Load Temporary Add-on"
 4. Select this repo `manifest.json` file
-
-When the add-on blocks tracker requests, you will see a Blok icon appear in the location bar. Click on it to see information about what was blocked.
