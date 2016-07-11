@@ -9,9 +9,11 @@ We will run this add-on thru [Test Pilot experimentation](https://testpilot.fire
 
 When we have breakage data and user feedback, we will change the tracking protection implementation, so users get better web experience with tracking protection.
 
+
 ## Requirements
 
 * Firefox 48+
+
 
 ## Run it
 
@@ -22,20 +24,28 @@ When we have breakage data and user feedback, we will change the tracking protec
 When the add-on blocks tracker requests, you will see a Blok notification bar
 like the screenshot.
 
+
 ## Development
+
+1. Clone this repo locally
+2. `cd blok`
+3. `npm install`
+4. `npm run bundle`
 
 ### With `web-ext`
 
-1. Clone this repo locally
-2. [Install `web-ext`](https://github.com/mozilla/web-ext/#documentation) if
+1. [Install `web-ext`](https://github.com/mozilla/web-ext/#documentation) if
    you haven't already
-3. `cd blok`
-4. `web-ext run`
+2. `web-ext run`
     
 
 ### Without `web-ext`
 
-1. Clone this repo locally
-2. Go to `about:debugging`
-3. Click "Load Temporary Add-on"
-4. Select this repo `manifest.json` file
+1. Go to `about:debugging`
+2. Click "Load Temporary Add-on"
+3. Select this repo `manifest.json` file
+
+
+## Testing
+
+`npm test`

@@ -7,7 +7,8 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "tape tests/**/*.js | faucet"
+    "test": "tape tests/**/*.js | faucet",
+    "bundle": "browserify js/background.js > js/background.bundle.js"
   },
   "repository": {
     "type": "git",
