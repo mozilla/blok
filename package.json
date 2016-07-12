@@ -1,0 +1,35 @@
+{
+  "name": "blok",
+  "version": "1.0.0",
+  "description": "Web Extension implementation of Firefox tracking protection",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "tape tests/**/*.js | faucet",
+    "bundle": "browserify js/background.js > js/background.bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mozilla/blok.git"
+  },
+  "keywords": [
+    "mozilla",
+    "firefox",
+    "tracking",
+    "protection",
+    "web extension"
+  ],
+  "author": "Luke Crouch",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/mozilla/blok/issues"
+  },
+  "homepage": "https://github.com/mozilla/blok#readme",
+  "devDependencies": {
+    "browserify": "^13.0.1",
+    "faucet": "0.0.1",
+    "tape": "^4.6.0"
+  }
+}

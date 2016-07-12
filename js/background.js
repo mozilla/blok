@@ -1,3 +1,5 @@
+var {canonicalizeHost} = require('./canonicalize');
+
 var TESTPILOT_TELEMETRY_CHANNEL = 'testpilot-telemetry';
 var testpilotPingChannel = new BroadcastChannel(TESTPILOT_TELEMETRY_CHANNEL);
 
@@ -101,7 +103,8 @@ function blockTrackerRequests(requestDetails) {
     var requestHostInBlocklist = false;
 
     // Determine all origin flags
-    originTopHost = new URL(requestDetails.originUrl).host.split('.').slice(-2).join('.');
+    // NOTE: we may not need to canonicalize the origin host?
+    originTopHost = canonicalizeHost(new URL(requestDetails.originUrl).host);
     current_active_origin = originTopHost;
     current_origin_disabled_index = allowedHosts.indexOf(current_active_origin);
     
@@ -127,8 +130,17 @@ function blockTrackerRequests(requestDetails) {
         return {};
     }
 
-    requestTopHost = new URL(requestDetails.url).host.split('.').slice(-2).join('.');
-    requestHostInBlocklist = blocklist.hasOwnProperty(requestTopHost);
+    requestTopHost = canonicalizeHost(new URL(requestDetails.url).host);
+    // check if any host from lowest-level to top-level is in the blocklist
+    var requestHostnameParts = requestTopHost.split('.');
+    while (requestHostnameParts.length > 1) {
+      requestTopHost = requestHostnameParts.join('.');
+      requestHostInBlocklist = blocklist.hasOwnProperty(requestTopHost);
+      if (requestHostInBlocklist) {
+        break;
+      }
+      requestHostnameParts.splice(0, 1);
+    }
 
     // Allow requests to 3rd-party domains NOT in the block-list
     if (!requestHostInBlocklist) {
