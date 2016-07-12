@@ -1,14 +1,13 @@
 .blok-toolbar-spacer {
   width: 100%;
-  height: 26px;
+  height: 24px;
 }
 
 .blok-toolbar-iframe {
   position: fixed;
-  top: 0;
+  bottom: 0;
   left: 0;
   z-index: 10000;
   width: 100%;
-  height: 26px;
-  border: 0;
+  height: 24px;
 }
