@@ -7,9 +7,17 @@
     "test": "tests"
   },
   "scripts": {
+    "bundle": "browserify -d js/background.js > js/background.bundle.js",
+    "build": "npm test && npm run bundle && web-ext build",
+    "firefox": "npm run bundle && web-ext run",
     "test": "tape tests/**/*.js | faucet",
-    "bundle": "browserify js/background.js > js/background.bundle.js",
-    "build": "npm test && npm run bundle && web-ext build"
+    "watch": "npm-watch"
+  },
+  "watch": {
+    "bundle": {
+      "patterns": ["**/*.js"],
+      "ignore": "*bundle.js"
+    }
   },
   "repository": {
     "type": "git",
@@ -18,8 +26,7 @@
   "keywords": [
     "mozilla",
     "firefox",
-    "tracking",
-    "protection",
+    "tracking protection",
     "web extension"
   ],
   "author": "Luke Crouch",
@@ -31,6 +38,7 @@
   "devDependencies": {
     "browserify": "^13.0.1",
     "faucet": "0.0.1",
+    "npm-watch": "^0.1.5",
     "tape": "^4.6.0"
   }
 }
