@@ -143,7 +143,8 @@ function startListeners({blocklist, allowedHosts}) {
 
 const state = {
   blocklist: {},
-  allowedHosts: []
+  allowedHosts: [],
+  entityList: {}
 };
 
 loadLists(state).then(() => {
