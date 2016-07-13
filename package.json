@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "tape tests/**/*.js | faucet",
-    "bundle": "browserify js/background.js > js/background.bundle.js"
+    "bundle": "browserify js/background.js > js/background.bundle.js",
+    "build": "npm test && npm run bundle && web-ext build"
   },
   "repository": {
     "type": "git",
