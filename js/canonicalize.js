@@ -11,7 +11,6 @@ function trim(str, chars) {
   return str.replace(new RegExp('^' + chars + '+|' + chars + '+$', 'g'), '');
 }
 
-exports.trim = trim;
 
 // https://developers.google.com/safe-browsing/v4/urls-hashing#canonicalization
 function canonicalizeHost(host) {
@@ -45,4 +44,20 @@ function canonicalizeHost(host) {
   return canonicalizedHost;
 }
 
-exports.canonicalizeHost = canonicalizeHost;
+
+function allHosts(host) {
+  const allHosts = [];
+  const hostParts = host.split('.');
+  while (hostParts.length > 1) {
+    allHosts.push(hostParts.join('.'));
+    hostParts.splice(0, 1);
+  }
+  return allHosts;
+}
+
+
+module.exports = {
+  allHosts,
+  canonicalizeHost,
+  trim
+}

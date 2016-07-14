@@ -1,4 +1,4 @@
-var {canonicalizeHost} = require('./canonicalize');
+var {allHosts, canonicalizeHost} = require('./canonicalize');
 const {loadLists} = require('./lists');
 
 var TESTPILOT_TELEMETRY_CHANNEL = 'testpilot-telemetry';
@@ -64,14 +64,12 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
 
     requestTopHost = canonicalizeHost(new URL(requestDetails.url).host);
     // check if any host from lowest-level to top-level is in the blocklist
-    var requestHostnameParts = requestTopHost.split('.');
-    while (requestHostnameParts.length > 1) {
-      requestTopHost = requestHostnameParts.join('.');
-      requestHostInBlocklist = blocklist.hasOwnProperty(requestTopHost);
+    allRequestHosts = allHosts(requestTopHost);
+    for (requestHost of allRequestHosts) {
+      requestHostInBlocklist = blocklist.hasOwnProperty(requestHost);
       if (requestHostInBlocklist) {
         break;
       }
-      requestHostnameParts.splice(0, 1);
     }
 
     // Allow requests to 3rd-party domains NOT in the block-list
@@ -82,21 +80,29 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
 
     requestIsThirdParty = requestTopHost != originTopHost;
 
-    // Block if the request host is 3rd-party
     if (requestIsThirdParty) {
       console.log("requestTopHost: " + requestTopHost + " does not match originTopHost: " + originTopHost + "...");
 
-      // Check if origin property is requesting a "3rd-party" resource belonging to the same entity
       for (entityName in entityList) {
         var entity = entityList[entityName];
-        var originIsEntityProperty = false;
         var requestIsEntityResource = false;
+        var originIsEntityProperty = false;
 
-        originIsEntityProperty = entity.properties.hasOwnProperty(originTopHost);
-        requestIsEntityResource = entity.resources.hasOwnProperty(requestTopHost);
+        for (requestHost of allHosts(requestTopHost)) {
+          requestIsEntityResource = entity.resources.indexOf(requestHost) > -1;
+          if (requestIsEntityResource) {
+            break;
+          }
+        }
+        for (originHost of allHosts(originTopHost)) {
+          originIsEntityProperty = entity.properties.indexOf(originHost) > -1;
+          if (originIsEntityProperty) {
+            break;
+          }
+        }
 
         if (originIsEntityProperty && requestIsEntityResource) {
-          console.log("origin property and resource request belong to the same entity: " + entityName + "; allowing request");
+          console.log("origin property of " + originHost + " and resource requested from " + requestHost + " belong to the same entity: " + entityName + "; allowing request");
           total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
           return {};
         }
