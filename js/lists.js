@@ -28,6 +28,7 @@ function loadJSON(url) {
 
 
 function processEntityListJSON(data, entityList) {
+  entityList = data;
 }
 
 function processBlockListJSON(data, blocklist) {

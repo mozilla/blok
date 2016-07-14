@@ -20,7 +20,7 @@ function restartBlokForTab(tabID) {
 }
 
 
-function blockTrackerRequests(blocklist, allowedHosts) {
+function blockTrackerRequests(blocklist, allowedHosts, entityList) {
   return function filterRequest(requestDetails) {
     var blockTrackerRequestsStart = Date.now();
     var requestTabID = requestDetails.tabId;
@@ -32,6 +32,7 @@ function blockTrackerRequests(blocklist, allowedHosts) {
     var newOrigin = false;
 
     var requestHostInBlocklist = false;
+    var requestIsThirdParty = false;
 
     // Determine all origin flags
     // NOTE: we may not need to canonicalize the origin host?
@@ -79,9 +80,28 @@ function blockTrackerRequests(blocklist, allowedHosts) {
         return {};
     }
 
+    requestIsThirdParty = requestTopHost != originTopHost;
+
     // Block if the request host is 3rd-party
-    if (requestTopHost != originTopHost) {
-      console.log("requestTopHost: " + requestTopHost + " does not match originTopHost: " + originTopHost + ". Blocking request.");
+    if (requestIsThirdParty) {
+      console.log("requestTopHost: " + requestTopHost + " does not match originTopHost: " + originTopHost + "...");
+
+      // Check if origin property is requesting a "3rd-party" resource belonging to the same entity
+      for (entityName in entityList) {
+        var entity = entityList[entityName];
+        var originIsEntityProperty = false;
+        var requestIsEntityResource = false;
+
+        originIsEntityProperty = entity.properties.hasOwnProperty(originTopHost);
+        requestIsEntityResource = entity.resources.hasOwnProperty(requestTopHost);
+
+        if (originIsEntityProperty && requestIsEntityResource) {
+          console.log("origin property and resource request belong to the same entity: " + entityName + "; allowing request");
+          total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
+          return {};
+        }
+      }
+
       blocked_requests[requestTabID].push(requestTopHost);
       console.log("blocked " + blocked_requests[requestTabID].length + " requests: " + blocked_requests[requestTabID]);
 
@@ -97,9 +117,9 @@ function blockTrackerRequests(blocklist, allowedHosts) {
 }
 
 
-function startListeners({blocklist, allowedHosts}) {
+function startListeners({blocklist, allowedHosts, entityList}) {
   chrome.webRequest.onBeforeRequest.addListener(
-      blockTrackerRequests(blocklist, allowedHosts),
+      blockTrackerRequests(blocklist, allowedHosts, entityList),
       {urls:["*://*/*"]},
       ["blocking"]
   );
