@@ -1,15 +1,15 @@
 function loadLists(state) {
-  const {blocklist, allowedHosts, entityList} = state;
-
   const blockListPromise = loadJSON('disconnect-blocklist.json').then((xhr) => {
-    processBlockListJSON(xhr.response, blocklist);
+    state.blocklist = processBlockListJSON(xhr.response);
   });
 
   const entityListPromise = loadJSON('disconnect-entitylist.json').then((xhr) => {
-    processEntityListJSON(xhr.response, entityList);
+    state.entityList = xhr.response;
   });
 
-  const allowedHostsPromise = getAllowedHostsList(allowedHosts);
+  const allowedHostsPromise = getAllowedHostsList().then((allowedHosts) => {
+    state.allowedHosts = allowedHosts;
+  });
 
   return Promise.all([blockListPromise, entityListPromise, allowedHostsPromise]);
 }
@@ -27,11 +27,9 @@ function loadJSON(url) {
 }
 
 
-function processEntityListJSON(data, entityList) {
-  entityList = data;
-}
+function processBlockListJSON(data) {
+  const blocklist = {};
 
-function processBlockListJSON(data, blocklist) {
   // remove un-needed categories per disconnect
   delete data.categories['Content'];
   delete data.categories['Legacy Disconnect'];
@@ -67,10 +65,12 @@ function processBlockListJSON(data, blocklist) {
     }
   }
 
+  return blocklist;
+
 }
 
 
-function getAllowedHostsList(allowedHosts) {
+function getAllowedHostsList() {
   return new Promise(function(resolve, reject) {
     browser.storage.local.get("allowedHosts", function(item) {
       if (Object.keys(item).length === 0) {
