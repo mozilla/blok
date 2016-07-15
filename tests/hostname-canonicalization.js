@@ -1,25 +1,25 @@
 var test = require('tape');
-var {canonicalizeHost} = require('../js/canonicalize');
+var {allHosts, canonicalizeHost} = require('../js/canonicalize');
 
-test('plain host is plain', function(t) {
+test('canonicalizeHost plain host is plain', function(t) {
   t.plan(1);
   t.equal(canonicalizeHost('trackertest.org'), 'trackertest.org');
 });
 
-test('leading and trailing dots are trimmed', function(t) {
+test('canonicalizeHost leading and trailing dots are trimmed', function(t) {
   t.plan(3);
   t.equal(canonicalizeHost('.trackertest.org'), 'trackertest.org');
   t.equal(canonicalizeHost('trackertest.org.'), 'trackertest.org');
   t.equal(canonicalizeHost('.trackertest.org.'), 'trackertest.org');
 });
 
-test('consecutive dots are consolidated', function(t) {
+test('canonicalizeHost consecutive dots are consolidated', function(t) {
   t.plan(2);
   t.equal(canonicalizeHost('trackertest..org'), 'trackertest.org');
   t.equal(canonicalizeHost('track..trackertest..org'), 'track.trackertest.org');
 });
 
-test('ip4 addresses', function(t) {
+test('canonicalizeHost ip4 addresses decimal, hex, and octal', function(t) {
   // OpenDNS as test addresses
   t.plan(3);
   // plain decimal
@@ -30,13 +30,30 @@ test('ip4 addresses', function(t) {
   t.equal(canonicalizeHost('0320.0103.0336.0336'), '208.67.222.222');
 });
 
-test('lowercase everything', function(t) {
+test('canonicalizeHost lowercase everything', function(t) {
   t.plan(2);
   t.equal(canonicalizeHost('TrackerTest.Org'), 'trackertest.org');
   t.equal(canonicalizeHost('TRACKERTEST.ORG'), 'trackertest.org');
 });
 
-test('test everything together', function(t) {
+test('canonicalizeHost test everything together', function(t) {
   t.plan(1);
   t.equal(canonicalizeHost('..TRACK..TrackerTest.Org.'), 'track.trackertest.org');
+});
+
+test('allHosts returns single element for trackertest.org', function(t) {
+  t.plan(1);
+  t.deepEqual(allHosts('trackertest.org'), ['trackertest.org']);
+});
+
+test('allHosts returns multiple elements for tracky.track.trackertest.org', function(t) {
+  t.plan(1);
+  t.deepEqual(
+    allHosts('tracky.track.trackertest.org'),
+    [
+      'tracky.track.trackertest.org',
+      'track.trackertest.org',
+      'trackertest.org'
+    ]
+  );
 });

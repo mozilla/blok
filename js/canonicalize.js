@@ -11,7 +11,6 @@ function trim(str, chars) {
   return str.replace(new RegExp('^' + chars + '+|' + chars + '+$', 'g'), '');
 }
 
-exports.trim = trim;
 
 // https://developers.google.com/safe-browsing/v4/urls-hashing#canonicalization
 function canonicalizeHost(host) {
@@ -25,8 +24,8 @@ function canonicalizeHost(host) {
   // normalize it to 4 dot-separated decimal values.
   // The client should handle any legal IP-address encoding,
   // including octal, hex, and TODO: fewer than four components
-  var isIP4Decimal = isIP4Hex = isIP4Octal = false;
   var base = 10;
+  var isIP4Decimal, isIP4Hex, isIP4Octal;
 
   isIP4Decimal = canonicalizedHost.match(ip4DecimalPattern) != null;
   isIP4Hex = canonicalizedHost.match(ip4HexPattern) != null;
@@ -45,4 +44,20 @@ function canonicalizeHost(host) {
   return canonicalizedHost;
 }
 
-exports.canonicalizeHost = canonicalizeHost;
+
+function allHosts(host) {
+  const allHosts = [];
+  const hostParts = host.split('.');
+  while (hostParts.length > 1) {
+    allHosts.push(hostParts.join('.'));
+    hostParts.splice(0, 1);
+  }
+  return allHosts;
+}
+
+
+module.exports = {
+  allHosts,
+  canonicalizeHost,
+  trim
+}

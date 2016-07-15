@@ -48,4 +48,6 @@ like the screenshot.
 
 ## Testing
 
+Requires node 6+
+
 `npm test`
