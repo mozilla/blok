@@ -66,20 +66,15 @@ function processBlockListJSON(data) {
   }
 
   return blocklist;
-
 }
 
 
 function getAllowedHostsList() {
-  return new Promise(function(resolve, reject) {
-    browser.storage.local.get("allowedHosts", function(item) {
-      if (Object.keys(item).length === 0) {
-        allowedHosts = [];
-      } else {
-        allowedHosts = item.allowedHosts;
-      }
-      resolve(allowedHosts);
-    });
+  return browser.storage.local.get("allowedHosts").then((item) => {
+    if (item.allowedHosts) {
+      return item.allowedHosts;
+    }
+    return [];
   });
 }
 

@@ -3,7 +3,7 @@ var toolbarFrame;
 if (window.parent == window) {
   toolbarFrame = document.getElementById('blok-toolbar-iframe');
 
-  chrome.runtime.onMessage.addListener(function (message) {
+  browser.runtime.onMessage.addListener(function (message) {
     if (message == "close-toolbar") {
       document.querySelector('#blok-toolbar-spacer').remove();
       toolbarFrame.remove();
@@ -20,7 +20,7 @@ if (window.parent == window) {
       toolbarFrame = document.createElement("iframe");
       toolbarFrame.setAttribute("id", "blok-toolbar-iframe");
       toolbarFrame.setAttribute("class", "blok-toolbar-iframe");
-      toolbarFrame.setAttribute("src", chrome.runtime.getURL('toolbar.html'));
+      toolbarFrame.setAttribute("src", browser.runtime.getURL('toolbar.html'));
       document.body.appendChild(toolbarFrame);
     }
   });

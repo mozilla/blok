@@ -47,7 +47,7 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
     // Allow request if the origin has been added to allowedHosts
     if (currentOriginDisabled) {
       console.log("Protection disabled for this site; allowing request.");
-      chrome.tabs.sendMessage(requestTabID,
+      browser.tabs.sendMessage(requestTabID,
           {
             'origin-disabled': originTopHost,
             'reason-given': reasons_given[requestTabID]
@@ -64,8 +64,8 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
 
     requestTopHost = canonicalizeHost(new URL(requestDetails.url).host);
     // check if any host from lowest-level to top-level is in the blocklist
-    allRequestHosts = allHosts(requestTopHost);
-    for (requestHost of allRequestHosts) {
+    var allRequestHosts = allHosts(requestTopHost);
+    for (let requestHost of allRequestHosts) {
       requestHostInBlocklist = blocklist.hasOwnProperty(requestHost);
       if (requestHostInBlocklist) {
         break;
@@ -81,20 +81,20 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
     requestIsThirdParty = requestTopHost != originTopHost;
 
     if (requestIsThirdParty) {
-      console.log("requestTopHost: " + requestTopHost + " does not match originTopHost: " + originTopHost + "...");
+      console.log("requestTopHost: ${requestTopHost} does not match originTopHost: ${originTopHost}...");
 
       for (entityName in entityList) {
         var entity = entityList[entityName];
         var requestIsEntityResource = false;
         var originIsEntityProperty = false;
 
-        for (requestHost of allHosts(requestTopHost)) {
+        for (let requestHost of allHosts(requestTopHost)) {
           requestIsEntityResource = entity.resources.indexOf(requestHost) > -1;
           if (requestIsEntityResource) {
             break;
           }
         }
-        for (originHost of allHosts(originTopHost)) {
+        for (let originHost of allHosts(originTopHost)) {
           originIsEntityProperty = entity.properties.indexOf(originHost) > -1;
           if (originIsEntityProperty) {
             break;
@@ -102,7 +102,7 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
         }
 
         if (originIsEntityProperty && requestIsEntityResource) {
-          console.log("origin property of " + originHost + " and resource requested from " + requestHost + " belong to the same entity: " + entityName + "; allowing request");
+          console.log("origin property of ${originHost} and resource requested from ${requestHost} belong to the same entity: ${entityName}; allowing request");
           total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
           return {};
         }
@@ -113,36 +113,42 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
 
       total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
       console.log("total_exec_time: " + total_exec_time[requestTabID]);
-      chrome.tabs.sendMessage(requestTabID, {
+      browser.tabs.sendMessage(requestTabID, {
         blocked_requests: blocked_requests[requestTabID]
       });
 
       return {cancel: true};
     }
+
+  // none of the above checks matched, so default to allowing the request
+  total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
+  return {}
+
   }
+
 }
 
 
 function startListeners({blocklist, allowedHosts, entityList}) {
-  chrome.webRequest.onBeforeRequest.addListener(
+  browser.webRequest.onBeforeRequest.addListener(
       blockTrackerRequests(blocklist, allowedHosts, entityList),
       {urls:["*://*/*"]},
       ["blocking"]
   );
 
-  chrome.tabs.onActivated.addListener(function(activeInfo) {
+  browser.tabs.onActivated.addListener(function(activeInfo) {
     current_active_tab_id = activeInfo.tabId;
   });
 
-  chrome.tabs.onUpdated.addListener(function(tabID, changeInfo) {
+  browser.tabs.onUpdated.addListener(function(tabID, changeInfo) {
     if (changeInfo.status == "loading") {
       restartBlokForTab(tabID);
     }
   });
 
-  chrome.runtime.onMessage.addListener(function (message) {
+  browser.runtime.onMessage.addListener(function (message) {
     if (message == "close-toolbar") {
-      chrome.tabs.sendMessage(current_active_tab_id, 'close-toolbar');
+      browser.tabs.sendMessage(current_active_tab_id, 'close-toolbar');
     }
     if (message == "disable") {
       allowedHosts.push(current_active_origin);
