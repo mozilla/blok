@@ -1,10 +1,16 @@
 browser.runtime.onMessage.addListener(function (runtimeMessage) {
-  var blockedCount, blockedForm;
+  var blockedCount, blockedForm, allowedCount;
   if (runtimeMessage.hasOwnProperty('origin-disabled')) {
+    allowedCount = runtimeMessage.allowed_requests.length;
+
     document.querySelector('#title-blocking').className = 'hide';
     document.querySelector('#title-disabled').className = 'title';
-    document.querySelector('#title-origin').innerHTML = runtimeMessage['origin-disabled'];
-    document.querySelector('#disable').className = 'hide';
+    document.querySelector('#title-allowed-count').innerHTML = allowedCount;
+
+    for (feedbackElement of document.querySelectorAll('.feedback')) {
+      feedbackElement.className = 'feedback hide';
+    }
+
     if (runtimeMessage.hasOwnProperty('reason-given') && runtimeMessage['reason-given'] != null) {
       document.querySelector('#disable-reason-thankyou').className = '';
     } else {
@@ -16,24 +22,19 @@ browser.runtime.onMessage.addListener(function (runtimeMessage) {
   }
 });
 
-document.querySelector('#disable-btn').addEventListener('click', function (event) {
+document.querySelector('#disable-link').addEventListener('click', function (event) {
   browser.runtime.sendMessage("disable");
 });
 
-document.querySelector('#re-enable-btn').addEventListener('click', function (event) {
+document.querySelector('#re-enable-link').addEventListener('click', function (event) {
   browser.runtime.sendMessage("re-enable");
 });
 
-for (let closeBtn of document.querySelectorAll('.close-btn')) {
-  closeBtn.addEventListener('click', function (event) {
-    browser.runtime.sendMessage("close-toolbar");
-  });
-}
-
-for (reasonBtn of document.querySelectorAll('.reason')) {
-  reasonBtn.addEventListener('click', function (event) {
-    browser.runtime.sendMessage({"disable-reason": event.target.text});
-    document.querySelector('#disable-reasons').className = 'hide';
-    document.querySelector('#disable-reason-thankyou').className = '';
+for (feedbackBtn of document.querySelectorAll('.feedback-btn')) {
+  feedbackBtn.addEventListener('click', function (event) {
+    var feedback = event.target.dataset.feedback;
+    browser.runtime.sendMessage({"feedback": feedback});
+    document.querySelector('.feedback').className = 'hide';
+    document.querySelector('#feedback-' + feedback).className = 'feedback';
   });
 }

@@ -9,6 +9,7 @@ var current_active_tab_id = 1;
 var current_origin_disabled_index = -1;
 var current_active_origin;
 var blocked_requests = {};
+var allowed_requests = {};
 var total_exec_time = {};
 var reasons_given = {};
 var mainFrameOriginTopHosts = {};
@@ -16,6 +17,7 @@ var mainFrameOriginTopHosts = {};
 
 function restartBlokForTab(tabID) {
   blocked_requests[tabID] = [];
+  allowed_requests[tabID] = [];
   total_exec_time[tabID] = 0;
   reasons_given[tabID] = null;
   mainFrameOriginTopHosts[tabID] = null;
@@ -38,7 +40,6 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
     var requestHostMatchesMainFrame = false;
 
     // Determine all origin flags
-    // NOTE: we may not need to canonicalize the origin host?
     originTopHost = canonicalizeHost(new URL(requestDetails.originUrl).host);
     current_active_origin = originTopHost;
     current_origin_disabled_index = allowedHosts.indexOf(current_active_origin);
@@ -52,17 +53,6 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
     firefoxOrigin = (typeof originTopHost !== "undefined" && originTopHost.includes('moz-nullprincipal'));
     newOrigin = originTopHost == '';
 
-    // Allow request if the origin has been added to allowedHosts
-    if (currentOriginDisabled) {
-      console.log("Protection disabled for this site; allowing request.");
-      browser.tabs.sendMessage(requestTabID,
-          {
-            'origin-disabled': originTopHost,
-            'reason-given': reasons_given[requestTabID]
-          }
-      );
-      return {};
-    }
 
     // Allow request originating from Firefox and/or new tab/window origins
     if (firefoxOrigin || newOrigin) {
@@ -128,6 +118,20 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
           total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
           return {};
         }
+      }
+
+      // Allow request if the origin has been added to allowedHosts
+      if (currentOriginDisabled) {
+        console.log("Protection disabled for this site; allowing request.");
+        browser.tabs.sendMessage(requestTabID,
+            {
+              'origin-disabled': originTopHost,
+              'reason-given': reasons_given[requestTabID],
+              'allowed_requests': allowed_requests[requestTabID]
+            }
+        );
+        allowed_requests[requestTabID].push(requestTopHost);
+        return {};
       }
 
       blocked_requests[requestTabID].push(requestTopHost);
