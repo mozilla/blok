@@ -11,12 +11,14 @@ var current_active_origin;
 var blocked_requests = {};
 var total_exec_time = {};
 var reasons_given = {};
+var mainFrameOriginTopHosts = {};
 
 
 function restartBlokForTab(tabID) {
   blocked_requests[tabID] = [];
   total_exec_time[tabID] = 0;
   reasons_given[tabID] = null;
+  mainFrameOriginTopHosts[tabID] = null;
 }
 
 
@@ -33,6 +35,7 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
 
     var requestHostInBlocklist = false;
     var requestIsThirdParty = false;
+    var requestHostMatchesMainFrame = false;
 
     // Determine all origin flags
     // NOTE: we may not need to canonicalize the origin host?
@@ -40,6 +43,11 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
     current_active_origin = originTopHost;
     current_origin_disabled_index = allowedHosts.indexOf(current_active_origin);
     
+    if (requestDetails.frameId == 0) {
+      console.log(`requestDetails.frameId == 0, setting mainFrameOriginTopHosts[requestTabID] = ${originTopHost}`);
+      mainFrameOriginTopHosts[requestTabID] = originTopHost;
+    }
+
     currentOriginDisabled = current_origin_disabled_index > -1;
     firefoxOrigin = (typeof originTopHost !== "undefined" && originTopHost.includes('moz-nullprincipal'));
     newOrigin = originTopHost == '';
@@ -81,12 +89,19 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
     requestIsThirdParty = requestTopHost != originTopHost;
 
     if (requestIsThirdParty) {
-      console.log("requestTopHost: ${requestTopHost} does not match originTopHost: ${originTopHost}...");
+      // Allow all requests to the main frame origin domain from child frames' pages
+      requestHostMatchesMainFrame = (requestDetails.frameId > 0 && requestTopHost == mainFrameOriginTopHosts[requestTabID]);
+      if (requestHostMatchesMainFrame) {
+        total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
+        return {};
+      }
+      console.log(`requestTopHost: ${requestTopHost} does not match originTopHost: ${originTopHost}...`);
 
       for (entityName in entityList) {
         var entity = entityList[entityName];
         var requestIsEntityResource = false;
         var originIsEntityProperty = false;
+        var mainFrameOriginIsEntityProperty = false;
 
         for (let requestHost of allHosts(requestTopHost)) {
           requestIsEntityResource = entity.resources.indexOf(requestHost) > -1;
@@ -101,8 +116,15 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
           }
         }
 
-        if (originIsEntityProperty && requestIsEntityResource) {
-          console.log("origin property of ${originHost} and resource requested from ${requestHost} belong to the same entity: ${entityName}; allowing request");
+        for (let mainFrameOriginHost of allHosts(mainFrameOriginTopHosts[requestTabID])) {
+          mainFrameOriginIsEntityProperty = entity.properties.indexOf(mainFrameOriginHost) > -1;
+          if (mainFrameOriginIsEntityProperty) {
+            break;
+          }
+        }
+
+        if ((originIsEntityProperty || mainFrameOriginIsEntityProperty) && requestIsEntityResource) {
+          console.log(`originTopHost ${originTopHost} and resource requestTopHost ${requestTopHost} belong to the same entity: ${entityName}; allowing request`);
           total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
           return {};
         }
