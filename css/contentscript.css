@@ -11,3 +11,19 @@
   width: 100%;
   height: 24px;
 }
+
+.reveal {
+  padding: 0;
+}
+
+.top-bar-left {
+  font-weight: bold;
+}
+
+.row {
+  padding: 1em;
+}
+
+input[type="radio"] {
+  margin: 0;
+}

@@ -45,7 +45,6 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
     current_origin_disabled_index = allowedHosts.indexOf(current_active_origin);
     
     if (requestDetails.frameId == 0) {
-      console.log(`requestDetails.frameId == 0, setting mainFrameOriginTopHosts[requestTabID] = ${originTopHost}`);
       mainFrameOriginTopHosts[requestTabID] = originTopHost;
     }
 
@@ -135,10 +134,8 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
       }
 
       blocked_requests[requestTabID].push(requestTopHost);
-      console.log("blocked " + blocked_requests[requestTabID].length + " requests: " + blocked_requests[requestTabID]);
 
       total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
-      console.log("total_exec_time: " + total_exec_time[requestTabID]);
       browser.tabs.sendMessage(requestTabID, {
         blocked_requests: blocked_requests[requestTabID]
       });
@@ -169,13 +166,13 @@ function startListeners({blocklist, allowedHosts, entityList}) {
   browser.tabs.onUpdated.addListener(function(tabID, changeInfo) {
     if (changeInfo.status == "loading") {
       restartBlokForTab(tabID);
+    } else if (changeInfo.status == "complete") {
+      console.log("blocked " + blocked_requests[tabID].length + " requests: " + blocked_requests[tabID]);
+      console.log("total_exec_time: " + total_exec_time[tabID]);
     }
   });
 
   browser.runtime.onMessage.addListener(function (message) {
-    if (message == "close-toolbar") {
-      browser.tabs.sendMessage(current_active_tab_id, 'close-toolbar');
-    }
     if (message == "disable") {
       allowedHosts.push(current_active_origin);
       browser.storage.local.set({allowedHosts: allowedHosts});
@@ -186,13 +183,20 @@ function startListeners({blocklist, allowedHosts, entityList}) {
       browser.storage.local.set({allowedHosts: allowedHosts});
       browser.tabs.reload(current_active_tab_id);
     }
-    if (message.hasOwnProperty('disable-reason')) {
+    if (message.hasOwnProperty('feedback')) {
       testpilotPingChannel.postMessage({
         originDomain: current_active_origin,
         trackerDomains: blocked_requests[current_active_tab_id],
-        reason: message['disable-reason']
+        feedback: message.feedback
       });
-      reasons_given[current_active_tab_id] = message['disable-reason'];
+      browser.tabs.sendMessage(current_active_tab_id, message);
+    }
+    if (message.hasOwnProperty('breakage')) {
+      testpilotPingChannel.postMessage({
+        originDomain: current_active_origin,
+        trackerDomains: blocked_requests[current_active_tab_id],
+        breakage: message.breakage
+      });
     }
   });
 

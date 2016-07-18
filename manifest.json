@@ -22,8 +22,8 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["/js/contentscript.js"],
-      "css": ["/css/contentscript.css"],
+      "js": ["/js/jquery.js", "/js/foundation.min.js", "/js/contentscript.js"],
+      "css": ["/css/foundation.min.css", "/css/contentscript.css"],
       "run_at": "document_start"
     }
   ],
