@@ -173,6 +173,7 @@ function startListeners({blocklist, allowedHosts, entityList}) {
   });
 
   browser.runtime.onMessage.addListener(function (message) {
+    browser.tabs.sendMessage(current_active_tab_id, message);
     if (message == "disable") {
       allowedHosts.push(current_active_origin);
       browser.storage.local.set({allowedHosts: allowedHosts});
@@ -184,19 +185,23 @@ function startListeners({blocklist, allowedHosts, entityList}) {
       browser.tabs.reload(current_active_tab_id);
     }
     if (message.hasOwnProperty('feedback')) {
-      testpilotPingChannel.postMessage({
+      let testPilotPingMessage = {
         originDomain: current_active_origin,
         trackerDomains: blocked_requests[current_active_tab_id],
         feedback: message.feedback
-      });
-      browser.tabs.sendMessage(current_active_tab_id, message);
+      };
+      console.log(JSON.stringify(testPilotPingMessage));
+      testpilotPingChannel.postMessage(testPilotPingMessage);
     }
     if (message.hasOwnProperty('breakage')) {
-      testpilotPingChannel.postMessage({
+      let testPilotPingMessage = {
         originDomain: current_active_origin,
         trackerDomains: blocked_requests[current_active_tab_id],
-        breakage: message.breakage
-      });
+        breakage: message.breakage,
+        notes: message.notes
+      };
+      console.log(JSON.stringify(testPilotPingMessage));
+      testpilotPingChannel.postMessage(testPilotPingMessage);
     }
   });
 
