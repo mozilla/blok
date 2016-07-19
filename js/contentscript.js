@@ -1,7 +1,8 @@
-var toolbarFrame;
+var toolbarFrame, feedbackOverlay;
 
 if (window.parent == window) {
   toolbarFrame = document.getElementById('blok-toolbar-iframe');
+  feedbackModalOverlay = document.getElementById('blok-feedback-modal-overlay');
 
   browser.runtime.onMessage.addListener(function (message) {
     // Any message indicates Blok has something to show
@@ -19,18 +20,24 @@ if (window.parent == window) {
       document.body.appendChild(toolbarFrame);
     }
 
-    // page-problem message should show modal for feedback
-    if (message.feedback && message.feedback == "page-problem") {
-      let feedbackModalOverlay = document.createElement("div");
-      feedbackModalOverlay.setAttribute("class", "blok-feedback-modal-overlay");
+    if (!feedbackModalOverlay) {
+      feedbackModalOverlay = document.createElement("div");
+      feedbackModalOverlay.setAttribute("class", "blok-feedback-modal-overlay hide");
 
-      feedbackFrame = document.createElement("iframe");
+      let feedbackFrame = document.createElement("iframe");
       feedbackFrame.setAttribute("id", "blok-feedback-iframe");
       feedbackFrame.setAttribute("class", "blok-feedback-iframe");
       feedbackFrame.setAttribute("src", browser.runtime.getURL('feedback.html'));
 
       feedbackModalOverlay.appendChild(feedbackFrame);
       document.body.appendChild(feedbackModalOverlay);
+    }
+
+    // page-problem message should show modal for feedback
+    if (message.feedback && message.feedback == "page-problem") {
+      feedbackModalOverlay.setAttribute("class", "blok-feedback-modal-overlay");
+      console.log("message.origin: " + message.origin);
+      feedbackModalOverlay.querySelector('#blok-feedback-iframe').contentDocument.querySelector('#feedback-title-site-name').textContent = message.origin;
     }
 
     if (message == "close-feedback") {

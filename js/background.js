@@ -173,7 +173,6 @@ function startListeners({blocklist, allowedHosts, entityList}) {
   });
 
   browser.runtime.onMessage.addListener(function (message) {
-    browser.tabs.sendMessage(current_active_tab_id, message);
     if (message == "disable") {
       allowedHosts.push(current_active_origin);
       browser.storage.local.set({allowedHosts: allowedHosts});
@@ -190,8 +189,13 @@ function startListeners({blocklist, allowedHosts, entityList}) {
         trackerDomains: blocked_requests[current_active_tab_id],
         feedback: message.feedback
       };
-      console.log(JSON.stringify(testPilotPingMessage));
+      console.log("telemetry ping payload: " + JSON.stringify(testPilotPingMessage));
       testpilotPingChannel.postMessage(testPilotPingMessage);
+      console.log("mainFrameOriginTopHosts[current_active_tab_id]: " + mainFrameOriginTopHosts[current_active_tab_id]);
+      browser.tabs.sendMessage(current_active_tab_id, {
+        "feedback": message.feedback,
+        "origin": mainFrameOriginTopHosts[current_active_tab_id]
+      });
     }
     if (message.hasOwnProperty('breakage')) {
       let testPilotPingMessage = {
@@ -200,8 +204,12 @@ function startListeners({blocklist, allowedHosts, entityList}) {
         breakage: message.breakage,
         notes: message.notes
       };
-      console.log(JSON.stringify(testPilotPingMessage));
+      console.log("telemetry ping payload: " + JSON.stringify(testPilotPingMessage));
       testpilotPingChannel.postMessage(testPilotPingMessage);
+      browser.tabs.sendMessage(current_active_tab_id, message);
+    }
+    if (message == 'close-feedback') {
+      browser.tabs.sendMessage(current_active_tab_id, message);
     }
   });
 

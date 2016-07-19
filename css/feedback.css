@@ -24,6 +24,11 @@
   font-weight: bold;
 }
 
+.close-button {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
 .row {
   padding: 1em;
 }
