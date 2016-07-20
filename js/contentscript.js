@@ -22,7 +22,7 @@ if (window.parent == window) {
 
     if (!feedbackModalOverlay) {
       feedbackModalOverlay = document.createElement("div");
-      feedbackModalOverlay.setAttribute("class", "blok-feedback-modal-overlay hide");
+      feedbackModalOverlay.setAttribute("class", "blok-feedback-modal-overlay blok-hide");
 
       let feedbackFrame = document.createElement("iframe");
       feedbackFrame.setAttribute("id", "blok-feedback-iframe");
