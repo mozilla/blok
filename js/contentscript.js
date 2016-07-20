@@ -36,12 +36,15 @@ if (window.parent == window) {
     // page-problem message should show modal for feedback
     if (message.feedback && message.feedback == "page-problem") {
       feedbackModalOverlay.setAttribute("class", "blok-feedback-modal-overlay");
+      document.body.appendChild(feedbackModalOverlay);
       console.log("message.origin: " + message.origin);
       feedbackModalOverlay.querySelector('#blok-feedback-iframe').contentDocument.querySelector('#feedback-title-site-name').textContent = message.origin;
+    } else if (message.feedback && message.feedback == "page-works") {
+      feedbackModalOverlay.remove()
     }
 
     if (message == "close-feedback") {
-      document.querySelector(".blok-feedback-modal-overlay").remove();
+      feedbackModalOverlay.remove()
     }
   });
 }

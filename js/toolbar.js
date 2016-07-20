@@ -34,7 +34,9 @@ for (feedbackBtn of document.querySelectorAll('.feedback-btn')) {
   feedbackBtn.addEventListener('click', function (event) {
     var feedback = event.target.dataset.feedback;
     browser.runtime.sendMessage({"feedback": feedback});
-    document.querySelector('.feedback').className = 'hide';
+    for (feedbackDiv of document.querySelectorAll('.feedback')) {
+      feedbackDiv.className = 'hide';
+    }
     document.querySelector('#feedback-' + feedback).className = 'feedback';
   });
 }
