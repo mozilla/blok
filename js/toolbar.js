@@ -1,5 +1,5 @@
 browser.runtime.onMessage.addListener(function (runtimeMessage) {
-  var blockedCount, blockedForm, allowedCount;
+  var blockedCount, allowedCount;
   if (runtimeMessage.hasOwnProperty('origin-disabled')) {
     allowedCount = runtimeMessage.allowed_requests.length;
 
@@ -7,7 +7,7 @@ browser.runtime.onMessage.addListener(function (runtimeMessage) {
     document.querySelector('#title-disabled').className = 'title';
     document.querySelector('#title-allowed-count').innerHTML = allowedCount;
 
-    for (feedbackElement of document.querySelectorAll('.feedback')) {
+    for (let feedbackElement of document.querySelectorAll('.feedback')) {
       feedbackElement.className = 'feedback hide';
     }
 
@@ -22,19 +22,19 @@ browser.runtime.onMessage.addListener(function (runtimeMessage) {
   }
 });
 
-document.querySelector('#disable-link').addEventListener('click', function (event) {
+document.querySelector('#disable-link').addEventListener('click', function () {
   browser.runtime.sendMessage("disable");
 });
 
-document.querySelector('#re-enable-link').addEventListener('click', function (event) {
+document.querySelector('#re-enable-link').addEventListener('click', function () {
   browser.runtime.sendMessage("re-enable");
 });
 
-for (feedbackBtn of document.querySelectorAll('.feedback-btn')) {
+for (let feedbackBtn of document.querySelectorAll('.feedback-btn')) {
   feedbackBtn.addEventListener('click', function (event) {
     var feedback = event.target.dataset.feedback;
     browser.runtime.sendMessage({"feedback": feedback});
-    for (feedbackDiv of document.querySelectorAll('.feedback')) {
+    for (let feedbackDiv of document.querySelectorAll('.feedback')) {
       feedbackDiv.className = 'hide';
     }
     document.querySelector('#feedback-' + feedback).className = 'feedback';
