@@ -10,7 +10,9 @@ var current_active_tab_id = 1;
 var current_origin_disabled_index = -1;
 var current_active_origin;
 var blocked_requests = {};
+var blocked_entities = {};
 var allowed_requests = {};
+var allowed_entities = {};
 var total_exec_time = {};
 var reasons_given = {};
 var mainFrameOriginTopHosts = {};
@@ -18,7 +20,9 @@ var mainFrameOriginTopHosts = {};
 
 function restartBlokForTab(tabID) {
   blocked_requests[tabID] = [];
+  blocked_entities[tabID] = [];
   allowed_requests[tabID] = [];
+  allowed_entities[tabID] = [];
   total_exec_time[tabID] = 0;
   reasons_given[tabID] = null;
   mainFrameOriginTopHosts[tabID] = null;
@@ -36,6 +40,7 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
     var firefoxOrigin = false;
     var newOrigin = false;
 
+    var requestEntityName;
     var requestHostInBlocklist = false;
     var requestIsThirdParty = false;
     var requestHostMatchesMainFrame = false;
@@ -96,6 +101,7 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
         for (let requestHost of allHosts(requestTopHost)) {
           requestIsEntityResource = entity.resources.indexOf(requestHost) > -1;
           if (requestIsEntityResource) {
+            requestEntityName = entityName;
             break;
           }
         }
@@ -127,18 +133,25 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
             {
               'origin-disabled': originTopHost,
               'reason-given': reasons_given[requestTabID],
-              'allowed_requests': allowed_requests[requestTabID]
+              'allowed_entities': allowed_entities[requestTabID]
             }
         );
         allowed_requests[requestTabID].push(requestTopHost);
+        if (allowed_entities[requestTabID].indexOf(requestEntityName) === -1) {
+          allowed_entities[requestTabID].push(requestEntityName);
+        }
         return {};
       }
 
       blocked_requests[requestTabID].push(requestTopHost);
+      if (blocked_entities[requestTabID].indexOf(requestEntityName) === -1) {
+        blocked_entities[requestTabID].push(requestEntityName);
+      }
 
       total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
       browser.tabs.sendMessage(requestTabID, {
-        blocked_requests: blocked_requests[requestTabID]
+        blocked_requests: blocked_requests[requestTabID],
+        blocked_entities: blocked_entities[requestTabID]
       });
 
       return {cancel: true};
@@ -168,7 +181,11 @@ function startListeners({blocklist, allowedHosts, entityList}) {
     if (changeInfo.status == "loading") {
       restartBlokForTab(tabID);
     } else if (changeInfo.status == "complete") {
-      log("blocked " + blocked_requests[tabID].length + " requests: " + blocked_requests[tabID]);
+      let actionPerformed = (current_origin_disabled_index === -1) ? "Blocked " : "Detected ";
+      let actionRequests = (current_origin_disabled_index === -1) ? blocked_requests[tabID] : allowed_requests[tabID];
+      let actionEntities = (current_origin_disabled_index === -1) ? blocked_entities[tabID] : allowed_entities[tabID];
+      log("blocked " + actionRequests.length + " requests: " + actionRequests);
+      log("from " + actionEntities.length + " entities: " + actionEntities);
       log("total_exec_time: " + total_exec_time[tabID]);
     }
   });

@@ -1,11 +1,11 @@
 browser.runtime.onMessage.addListener(function (runtimeMessage) {
-  var blockedCount, allowedCount;
+  var blockedEntitiesCount, allowedEntitiesCount;
   if (runtimeMessage.hasOwnProperty('origin-disabled')) {
-    allowedCount = runtimeMessage.allowed_requests.length;
+    allowedEntitiesCount = runtimeMessage.allowed_entities.length;
 
     document.querySelector('#title-blocking').className = 'hide';
     document.querySelector('#title-disabled').className = 'title';
-    document.querySelector('#title-allowed-count').innerHTML = allowedCount;
+    document.querySelector('#title-allowed-count').innerHTML = allowedEntitiesCount;
 
     for (let feedbackElement of document.querySelectorAll('.feedback')) {
       feedbackElement.className = 'feedback hide';
@@ -17,8 +17,8 @@ browser.runtime.onMessage.addListener(function (runtimeMessage) {
       document.querySelector('#disable-reasons').className = '';
     }
   } else {
-    blockedCount = runtimeMessage.blocked_requests.length;
-    document.querySelector('#title-block-count').innerHTML = blockedCount;
+    blockedEntitiesCount = runtimeMessage.blocked_entities.length;
+    document.querySelector('#title-block-count').innerHTML = blockedEntitiesCount;
   }
 });
 
