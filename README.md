@@ -51,3 +51,10 @@ like the screenshot.
 Requires node 6+
 
 `npm test`
+
+## Distributing
+
+To distribute, you will need AMO access credentials. See the `web-ext` docs.
+
+1. Use [`web-ext
+   sign`](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/web-ext_command_reference#web-ext_sign)
