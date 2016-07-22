@@ -1,5 +1,6 @@
 var {allHosts, canonicalizeHost} = require('./canonicalize');
 const {loadLists} = require('./lists');
+const {log} = require('./log');
 
 var TESTPILOT_TELEMETRY_CHANNEL = 'testpilot-telemetry';
 var testpilotPingChannel = new BroadcastChannel(TESTPILOT_TELEMETRY_CHANNEL);
@@ -84,7 +85,7 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
         total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
         return {};
       }
-      console.log(`requestTopHost: ${requestTopHost} does not match originTopHost: ${originTopHost}...`);
+      log(`requestTopHost: ${requestTopHost} does not match originTopHost: ${originTopHost}...`);
 
       for (entityName in entityList) {
         var entity = entityList[entityName];
@@ -113,7 +114,7 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
         }
 
         if ((originIsEntityProperty || mainFrameOriginIsEntityProperty) && requestIsEntityResource) {
-          console.log(`originTopHost ${originTopHost} and resource requestTopHost ${requestTopHost} belong to the same entity: ${entityName}; allowing request`);
+          log(`originTopHost ${originTopHost} and resource requestTopHost ${requestTopHost} belong to the same entity: ${entityName}; allowing request`);
           total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
           return {};
         }
@@ -121,7 +122,7 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
 
       // Allow request if the origin has been added to allowedHosts
       if (currentOriginDisabled) {
-        console.log("Protection disabled for this site; allowing request.");
+        log("Protection disabled for this site; allowing request.");
         browser.tabs.sendMessage(requestTabID,
             {
               'origin-disabled': originTopHost,
@@ -167,8 +168,8 @@ function startListeners({blocklist, allowedHosts, entityList}) {
     if (changeInfo.status == "loading") {
       restartBlokForTab(tabID);
     } else if (changeInfo.status == "complete") {
-      console.log("blocked " + blocked_requests[tabID].length + " requests: " + blocked_requests[tabID]);
-      console.log("total_exec_time: " + total_exec_time[tabID]);
+      log("blocked " + blocked_requests[tabID].length + " requests: " + blocked_requests[tabID]);
+      log("total_exec_time: " + total_exec_time[tabID]);
     }
   });
 
@@ -189,9 +190,9 @@ function startListeners({blocklist, allowedHosts, entityList}) {
         trackerDomains: blocked_requests[current_active_tab_id],
         feedback: message.feedback
       };
-      console.log("telemetry ping payload: " + JSON.stringify(testPilotPingMessage));
+      log("telemetry ping payload: " + JSON.stringify(testPilotPingMessage));
       testpilotPingChannel.postMessage(testPilotPingMessage);
-      console.log("mainFrameOriginTopHosts[current_active_tab_id]: " + mainFrameOriginTopHosts[current_active_tab_id]);
+      log("mainFrameOriginTopHosts[current_active_tab_id]: " + mainFrameOriginTopHosts[current_active_tab_id]);
       browser.tabs.sendMessage(current_active_tab_id, {
         "feedback": message.feedback,
         "origin": mainFrameOriginTopHosts[current_active_tab_id]
@@ -204,7 +205,7 @@ function startListeners({blocklist, allowedHosts, entityList}) {
         breakage: message.breakage,
         notes: message.notes
       };
-      console.log("telemetry ping payload: " + JSON.stringify(testPilotPingMessage));
+      log("telemetry ping payload: " + JSON.stringify(testPilotPingMessage));
       testpilotPingChannel.postMessage(testPilotPingMessage);
       browser.tabs.sendMessage(current_active_tab_id, message);
     }
