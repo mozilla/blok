@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/foundation.min.css">
+    <link rel="stylesheet" href="css/feedback.css">
+  </head>
+
+  <body>
+
+    <div class="top-bar">
+      <div class="top-bar-left">
+        Report a problem with <span id="feedback-title-site-name"></span>:
+      </div>
+      <div class="top-bar-right">
+        <a class="close-feedback close-button" aria-label="Close modal" type="button">
+          <span aria-hidden="true">&times;</span>
+        </a>
+      </div>
+    </div>
+    <div class="row">
+      <fieldset>
+        <legend>What problems do you see?</legend>
+        <input type="radio" name="breakage" value="images" id="broken-images">
+        <label for="broken-images">Images</label>
+        <input type="radio" name="breakage" value="video" id="broken-video">
+        <label for="broken-video">Video</label>
+        <input type="radio" name="breakage" value="layout" id="broken-layout">
+        <label for="broken-layout">Layout</label>
+        <input type="radio" name="breakage" value="buttons" id="broken-buttons">
+        <label for="broken-buttons">Buttons</label>
+        <input type="radio" name="breakage" value="other" id="broken-other">
+        <label for="broken-other">Something else</label>
+      </fieldset>
+    </div>
+    <div class="row">
+      <label>
+        Why do you think Blok caused this problem?
+        <textarea id="notes" rows="3"></textarea>
+      </label>
+    </div>
+    <div class="row text-right">
+      <button class="normal close-feedback">Cancel</button>
+      <button class="submit">Submit</button>
+    </div>
+
+    <script src="js/feedback.js"></script>
+
+  </body>
+
+</html>

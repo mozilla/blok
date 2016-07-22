@@ -4,7 +4,6 @@
   <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="css/foundation.min.css">
-    <link rel="stylesheet" href="css/foundation-icons.css">
     <link rel="stylesheet" href="css/toolbar.css">
   </head>
 
@@ -12,29 +11,28 @@
 
     <div class="row">
       <div class="medium-6 columns">
-        <i class="fi-shield"></i>
+        <img src="icons/tracking-protection-16.svg" alt="Tracking Protection Icon" />
         <span id="title-blocking" class="title">
-          Blok prevented this site from requesting <span id="title-block-count"></span> trackers.
+          Blok has blocked <span id="title-block-count"></span> trackers.
+          To allow companies to track you, <a id="disable-link">disable Blok on this site.</a>
         </span>
         <span id="title-disabled" class="title hide">
-          Blok disabled for <span id="title-origin"></span>.
-          <a id="re-enable-btn" class="tiny button">Re-enable Blok</a>
+          Blok has detected <span id="title-allowed-count"></span> trackers.
+          To block companies from tracking you, <a id="re-enable-link">enable Blok on this site.</a>
         </span>
       </div>
       <div class="medium-6 columns text-right">
-        <div id="disable">
-          <a id="disable-btn" class="tiny button">Disable Blok</a>
-          <a class="tiny button close-btn"><i class="fi-x"></i></a>
+        <div id="feedback" class="feedback">
+          <a class="feedback-btn tiny button" data-feedback="page-works">This page works well.</a>
+          <a class="feedback-btn tiny button" data-feedback="page-problem">Report a problem.</a>
         </div>
-        <div id="disable-reasons" class="hide">
-          Please tell us why you disabled Blok:
-          <a id="disable-reason-broken" class="tiny button reason">The page was broken</a>
-          <a id="disable-reason-allow" class="tiny button reason">Other</a>
-          <a class="tiny secondary hollow button close-btn"><i class="fi-x"></i></a>
+        <div id="feedback-page-problem" class="feedback hide">
+          You reported a problem on this page.
+          <a class="feedback-btn tiny button" data-feedback="page-works">This page works well.</a>
         </div>
-        <div id="disable-reason-thankyou" class="hide">
-          Thank you for your feedback.
-          <a class="tiny secondary hollow button close-btn"><i class="fi-x"></i></a>
+        <div id="feedback-page-works" class="feedback hide">
+          You said this page works well.
+          <a class="feedback-btn tiny button" data-feedback="page-problem">Report a problem</a>
         </div>
       </div>
     </div>
