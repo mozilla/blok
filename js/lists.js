@@ -20,8 +20,8 @@ function loadJSON(url) {
     var xhr = new XMLHttpRequest();
     xhr.open('get', url, true);
     xhr.responseType = 'json';
-    xhr.addEventListener("load", () => resolve(xhr));
-    xhr.addEventListener("error", () => reject(xhr));
+    xhr.addEventListener('load', () => resolve(xhr));
+    xhr.addEventListener('error', () => reject(xhr));
     xhr.send();
   });
 }
@@ -70,7 +70,7 @@ function processBlockListJSON(data) {
 
 
 function getAllowedHostsList() {
-  return browser.storage.local.get("allowedHosts").then((item) => {
+  return browser.storage.local.get('allowedHosts').then((item) => {
     if (item.allowedHosts) {
       return item.allowedHosts;
     }

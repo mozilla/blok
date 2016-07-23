@@ -1,0 +1,18 @@
+env:
+  browser: true
+  es6: true
+  node: true
+
+extends:
+  - eslint:recommended
+
+globals:
+  browser: false
+
+root: true
+
+rules:
+  eqeqeq: 1
+  indent: [2, 2]
+  no-console: 0
+  quotes: [2, single]
