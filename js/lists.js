@@ -1,10 +1,10 @@
 function loadLists(state) {
-  const blockListPromise = loadJSON('disconnect-blocklist.json').then((xhr) => {
-    state.blocklist = processBlockListJSON(xhr.response);
+  const blockListPromise = loadJSON('disconnect-blocklist.json').then((data) => {
+    state.blocklist = processBlockListJSON(data);
   });
 
-  const entityListPromise = loadJSON('disconnect-entitylist.json').then((xhr) => {
-    state.entityList = xhr.response;
+  const entityListPromise = loadJSON('disconnect-entitylist.json').then((data) => {
+    state.entityList = data;
   });
 
   const allowedHostsPromise = getAllowedHostsList().then((allowedHosts) => {
@@ -16,14 +16,8 @@ function loadLists(state) {
 
 
 function loadJSON(url) {
-  return new Promise(function (resolve, reject) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('get', url, true);
-    xhr.responseType = 'json';
-    xhr.addEventListener("load", () => resolve(xhr));
-    xhr.addEventListener("error", () => reject(xhr));
-    xhr.send();
-  });
+  return fetch(url)
+    .then((res) => res.json());
 }
 
 
