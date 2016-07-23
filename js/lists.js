@@ -64,7 +64,7 @@ function processBlockListJSON(data) {
 
 
 function getAllowedHostsList() {
-  return browser.storage.local.get("allowedHosts").then((item) => {
+  return browser.storage.local.get('allowedHosts').then((item) => {
     if (item.allowedHosts) {
       return item.allowedHosts;
     }

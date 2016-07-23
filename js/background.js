@@ -55,14 +55,14 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
     }
 
     currentOriginDisabled = current_origin_disabled_index > -1;
-    firefoxOrigin = (typeof originTopHost !== "undefined" && originTopHost.includes('moz-nullprincipal'));
+    firefoxOrigin = (typeof originTopHost !== 'undefined' && originTopHost.includes('moz-nullprincipal'));
     newOrigin = originTopHost == '';
 
 
     // Allow request originating from Firefox and/or new tab/window origins
     if (firefoxOrigin || newOrigin) {
-        total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
-        return {};
+      total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
+      return {};
     }
 
     requestTopHost = canonicalizeHost(new URL(requestDetails.url).host);
@@ -77,8 +77,8 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
 
     // Allow requests to 3rd-party domains NOT in the block-list
     if (!requestHostInBlocklist) {
-        total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
-        return {};
+      total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
+      return {};
     }
 
     requestIsThirdParty = requestTopHost != originTopHost;
@@ -128,13 +128,13 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
 
       // Allow request if the origin has been added to allowedHosts
       if (currentOriginDisabled) {
-        log("Protection disabled for this site; allowing request.");
+        log('Protection disabled for this site; allowing request.');
         browser.tabs.sendMessage(requestTabID,
-            {
-              'origin-disabled': originTopHost,
-              'reason-given': reasons_given[requestTabID],
-              'allowed_entities': allowed_entities[requestTabID]
-            }
+          {
+            'origin-disabled': originTopHost,
+            'reason-given': reasons_given[requestTabID],
+            'allowed_entities': allowed_entities[requestTabID]
+          }
         );
         allowed_requests[requestTabID].push(requestTopHost);
         if (allowed_entities[requestTabID].indexOf(requestEntityName) === -1) {
@@ -158,8 +158,8 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
     }
 
   // none of the above checks matched, so default to allowing the request
-  total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
-  return {}
+    total_exec_time[requestTabID] += Date.now() - blockTrackerRequestsStart;
+    return {}
 
   }
 
@@ -169,8 +169,8 @@ function blockTrackerRequests(blocklist, allowedHosts, entityList) {
 function startListeners({blocklist, allowedHosts, entityList}) {
   browser.webRequest.onBeforeRequest.addListener(
       blockTrackerRequests(blocklist, allowedHosts, entityList),
-      {urls:["*://*/*"]},
-      ["blocking"]
+      {urls:['*://*/*']},
+      ['blocking']
   );
 
   browser.tabs.onActivated.addListener(function(activeInfo) {
@@ -178,25 +178,25 @@ function startListeners({blocklist, allowedHosts, entityList}) {
   });
 
   browser.tabs.onUpdated.addListener(function(tabID, changeInfo) {
-    if (changeInfo.status == "loading") {
+    if (changeInfo.status == 'loading') {
       restartBlokForTab(tabID);
-    } else if (changeInfo.status == "complete") {
-      let actionPerformed = (current_origin_disabled_index === -1) ? "Blocked " : "Detected ";
+    } else if (changeInfo.status == 'complete') {
+      let actionPerformed = (current_origin_disabled_index === -1) ? 'Blocked ' : 'Detected ';
       let actionRequests = (current_origin_disabled_index === -1) ? blocked_requests[tabID] : allowed_requests[tabID];
       let actionEntities = (current_origin_disabled_index === -1) ? blocked_entities[tabID] : allowed_entities[tabID];
-      log("blocked " + actionRequests.length + " requests: " + actionRequests);
-      log("from " + actionEntities.length + " entities: " + actionEntities);
-      log("total_exec_time: " + total_exec_time[tabID]);
+      log('blocked ' + actionRequests.length + ' requests: ' + actionRequests);
+      log('from ' + actionEntities.length + ' entities: ' + actionEntities);
+      log('total_exec_time: ' + total_exec_time[tabID]);
     }
   });
 
   browser.runtime.onMessage.addListener(function (message) {
-    if (message == "disable") {
+    if (message == 'disable') {
       allowedHosts.push(current_active_origin);
       browser.storage.local.set({allowedHosts: allowedHosts});
       browser.tabs.reload(current_active_tab_id);
     }
-    if (message == "re-enable") {
+    if (message == 're-enable') {
       allowedHosts.splice(current_origin_disabled_index, 1);
       browser.storage.local.set({allowedHosts: allowedHosts});
       browser.tabs.reload(current_active_tab_id);
@@ -207,12 +207,12 @@ function startListeners({blocklist, allowedHosts, entityList}) {
         trackerDomains: blocked_requests[current_active_tab_id],
         feedback: message.feedback
       };
-      log("telemetry ping payload: " + JSON.stringify(testPilotPingMessage));
+      log('telemetry ping payload: ' + JSON.stringify(testPilotPingMessage));
       testpilotPingChannel.postMessage(testPilotPingMessage);
-      log("mainFrameOriginTopHosts[current_active_tab_id]: " + mainFrameOriginTopHosts[current_active_tab_id]);
+      log('mainFrameOriginTopHosts[current_active_tab_id]: ' + mainFrameOriginTopHosts[current_active_tab_id]);
       browser.tabs.sendMessage(current_active_tab_id, {
-        "feedback": message.feedback,
-        "origin": mainFrameOriginTopHosts[current_active_tab_id]
+        'feedback': message.feedback,
+        'origin': mainFrameOriginTopHosts[current_active_tab_id]
       });
     }
     if (message.hasOwnProperty('breakage')) {
@@ -222,7 +222,7 @@ function startListeners({blocklist, allowedHosts, entityList}) {
         breakage: message.breakage,
         notes: message.notes
       };
-      log("telemetry ping payload: " + JSON.stringify(testPilotPingMessage));
+      log('telemetry ping payload: ' + JSON.stringify(testPilotPingMessage));
       testpilotPingChannel.postMessage(testPilotPingMessage);
       browser.tabs.sendMessage(current_active_tab_id, message);
     }
