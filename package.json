@@ -7,12 +7,13 @@
     "test": "tests"
   },
   "scripts": {
-    "bundle": "browserify -d -t envify js/background.js > js/background.bundle.js",
     "build": "npm test && MODE=production npm run bundle && web-ext build",
     "build-dev": "npm test && MODE=dev npm run bundle && web-ext build",
+    "bundle": "browserify -d -t envify js/background.js > js/background.bundle.js",
     "coverage": "nyc npm test",
     "firefox": "npm run bundle && web-ext run",
     "lint": "eslint .",
+    "pretest": "npm run lint",
     "test": "tape tests/**/*.js | faucet",
     "watch": "npm-watch"
   },
@@ -33,6 +34,7 @@
   },
   "homepage": "https://github.com/mozilla/blok#readme",
   "devDependencies": {
+    "addons-linter": "0.14.1",
     "browserify": "13.0.1",
     "envify": "3.4.1",
     "eslint": "3.1.1",

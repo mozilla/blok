@@ -1,4 +1,5 @@
-var toolbarFrame, feedbackModalOverlay;
+var feedbackModalOverlay;
+var toolbarFrame;
 
 toolbarFrame = document.getElementById('blok-toolbar-iframe');
 feedbackModalOverlay = document.getElementById('blok-feedback-modal-overlay');
@@ -33,16 +34,16 @@ browser.runtime.onMessage.addListener(function (message) {
   }
 
   // page-problem message should show modal for feedback
-  if (message.feedback && message.feedback == 'page-problem') {
+  if (message.feedback && message.feedback === 'page-problem') {
     feedbackModalOverlay.setAttribute('class', 'blok-feedback-modal-overlay');
     document.body.appendChild(feedbackModalOverlay);
     console.log('message.origin: ' + message.origin);
     feedbackModalOverlay.querySelector('#blok-feedback-iframe').contentDocument.querySelector('#feedback-title-site-name').textContent = message.origin;
-  } else if (message.feedback && message.feedback == 'page-works') {
-    feedbackModalOverlay.remove()
+  } else if (message.feedback && message.feedback === 'page-works') {
+    feedbackModalOverlay.remove();
   }
 
-  if (message == 'close-feedback') {
-    feedbackModalOverlay.remove()
+  if (message === 'close-feedback') {
+    feedbackModalOverlay.remove();
   }
 });

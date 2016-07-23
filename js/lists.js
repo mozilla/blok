@@ -42,17 +42,17 @@ function processBlockListJSON(data) {
   // blocklist["doubleclick.net"] = http://www.google.com
   // blocklist["google-analytics.com"] = http://www.google.com
   // etc.
-  for (category_name in data.categories) {
+  for (let category_name in data.categories) {
     var category = data.categories[category_name];
     var entity_count = category.length;
 
     for (var i = 0; i < entity_count; i++) {
       var entity = category[i];
 
-      for (entity_name in entity) {
+      for (let entity_name in entity) {
         var urls = entity[entity_name];
 
-        for (main_domain in urls) {
+        for (let main_domain in urls) {
           blocklist[main_domain] = [];
           var domains = urls[main_domain];
           var domains_count = domains.length;
@@ -81,4 +81,4 @@ function getAllowedHostsList() {
 
 module.exports = {
   loadLists
-}
+};

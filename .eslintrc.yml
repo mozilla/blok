@@ -8,12 +8,17 @@ extends:
 
 globals:
   browser: false
+  BroadcastChannel: false
 
 root: true
 
 rules:
-  eol-last: 2
-  eqeqeq: 1
+  eol-last: 1
+  eqeqeq: [2, smart]
   indent: [2, 2]
   no-console: 0
+  no-trailing-spaces: 1
+  no-unused-vars: 1 # TODO: Change to 2
+  one-var: [2, never]
   quotes: [2, single]
+  semi: [2, always]
