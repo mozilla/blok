@@ -12,6 +12,7 @@ globals:
 root: true
 
 rules:
+  eol-last: 2
   eqeqeq: 1
   indent: [2, 2]
   no-console: 0
