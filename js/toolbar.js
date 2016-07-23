@@ -1,5 +1,6 @@
 browser.runtime.onMessage.addListener(function (runtimeMessage) {
-  var blockedEntitiesCount, allowedEntitiesCount;
+  var allowedEntitiesCount;
+  var blockedEntitiesCount;
   if (runtimeMessage.hasOwnProperty('origin-disabled')) {
     allowedEntitiesCount = runtimeMessage.allowed_entities.length;
 
