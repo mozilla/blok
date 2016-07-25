@@ -34,22 +34,22 @@ function processBlockListJSON (data) {
   // blocklist["doubleclick.net"] = http://www.google.com
   // blocklist["google-analytics.com"] = http://www.google.com
   // etc.
-  for (const categoryName in data.categories) {
+  for (let categoryName in data.categories) {
     var category = data.categories[categoryName]
     var entityCount = category.length
 
     for (var i = 0; i < entityCount; i++) {
       var entity = category[i]
 
-      for (const entityName in entity) {
+      for (let entityName in entity) {
         var urls = entity[entityName]
 
-        for (const mainDomain in urls) {
+        for (let mainDomain in urls) {
           blocklist[mainDomain] = []
           var domains = urls[mainDomain]
           var domainsCount = domains.length
 
-          for (var j = 0; j < domainsCount; j++) {
+          for (let j = 0; j < domainsCount; j++) {
             blocklist[domains[j]] = mainDomain
           }
         }
