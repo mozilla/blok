@@ -25,11 +25,10 @@ function canonicalizeHost(host) {
   // The client should handle any legal IP-address encoding,
   // including octal, hex, and TODO: fewer than four components
   var base = 10;
-  var isIP4Decimal, isIP4Hex, isIP4Octal;
+  var isIP4Decimal = canonicalizedHost.match(ip4DecimalPattern) != null;
+  var isIP4Hex = canonicalizedHost.match(ip4HexPattern) != null;
+  var isIP4Octal = canonicalizedHost.match(ip4OctalPattern) != null;
 
-  isIP4Decimal = canonicalizedHost.match(ip4DecimalPattern) != null;
-  isIP4Hex = canonicalizedHost.match(ip4HexPattern) != null;
-  isIP4Octal = canonicalizedHost.match(ip4OctalPattern) != null;
   if (isIP4Hex || isIP4Octal) {
     if (isIP4Hex) {
       base = 16;
@@ -60,4 +59,4 @@ module.exports = {
   allHosts,
   canonicalizeHost,
   trim
-}
+};
