@@ -1,5 +1,5 @@
-if (process.env.MODE === "production") {
-  exports.log = function noop(){};
+if (process.env.MODE === 'production') {
+  exports.log = function noop () {}
 } else {
-  exports.log = console.log.bind(console);
+  exports.log = console.log.bind(console)
 }
