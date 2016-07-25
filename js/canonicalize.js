@@ -28,7 +28,7 @@ function canonicalizeHost (host) {
   isIP4Decimal = canonicalizedHost.match(ip4DecimalPattern) != null
   isIP4Hex = canonicalizedHost.match(ip4HexPattern) != null
   isIP4Octal = canonicalizedHost.match(ip4OctalPattern) != null
-  if (isIP4Hex || isIP4Octal) {
+  if (isIP4Decimal || isIP4Hex || isIP4Octal) {
     if (isIP4Hex) {
       base = 16
     } else if (isIP4Octal) {
