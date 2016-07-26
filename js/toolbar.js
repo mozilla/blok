@@ -1,11 +1,7 @@
 browser.runtime.onMessage.addListener(function (runtimeMessage) {
-  var blockedEntitiesCount, allowedEntitiesCount
   if (runtimeMessage.hasOwnProperty('origin-disabled')) {
-    allowedEntitiesCount = runtimeMessage.allowed_entities.length
-
     document.querySelector('#title-blocking').className = 'hide'
     document.querySelector('#title-disabled').className = 'title'
-    document.querySelector('#title-allowed-count').innerHTML = allowedEntitiesCount
 
     for (let feedbackElement of document.querySelectorAll('.feedback')) {
       feedbackElement.className = 'feedback hide'
@@ -16,9 +12,6 @@ browser.runtime.onMessage.addListener(function (runtimeMessage) {
     } else {
       document.querySelector('#disable-reasons').className = ''
     }
-  } else {
-    blockedEntitiesCount = runtimeMessage.blocked_entities.length
-    document.querySelector('#title-block-count').innerHTML = blockedEntitiesCount
   }
 })
 
