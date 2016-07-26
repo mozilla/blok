@@ -7,9 +7,8 @@ branches:
         - "master"
 
 before_install:
-    - npm i addons-linter web-ext -g
     - rm -f ./web-ext-artifacts/*.zip
 
 script:
     - npm run build
-    - addons-linter ./web-ext-artifacts/*.zip -o text
+    - npm run lint
