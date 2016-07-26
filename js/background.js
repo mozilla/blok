@@ -67,7 +67,7 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
     // check if any host from lowest-level to top-level is in the blocklist
     var allRequestHosts = allHosts(requestTopHost)
     for (let requestHost of allRequestHosts) {
-      requestHostInBlocklist = blocklist.hasOwnProperty(requestHost)
+      requestHostInBlocklist = blocklist.has(requestHost)
       if (requestHostInBlocklist) {
         break
       }
@@ -227,7 +227,7 @@ function startListeners ({blocklist, allowedHosts, entityList}) {
 }
 
 const state = {
-  blocklist: {},
+  blocklist: new Map(),
   allowedHosts: [],
   entityList: {}
 }
