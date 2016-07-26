@@ -5,3 +5,10 @@ node_js:
 branches:
     only:
         - "master"
+
+before_install:
+    - rm -f ./web-ext-artifacts/*.zip
+
+script:
+    - npm run build
+    - npm run lint
