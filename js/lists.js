@@ -20,7 +20,7 @@ function loadJSON (url) {
 }
 
 function processBlockListJSON (data) {
-  const blocklist = {}
+  const blocklist = new Map()
 
   // remove un-needed categories per disconnect
   delete data.categories['Content']
@@ -45,12 +45,12 @@ function processBlockListJSON (data) {
         var urls = entity[entityName]
 
         for (let mainDomain in urls) {
-          blocklist[mainDomain] = []
+          blocklist.set(mainDomain, [])
           var domains = urls[mainDomain]
           var domainsCount = domains.length
 
           for (let j = 0; j < domainsCount; j++) {
-            blocklist[domains[j]] = mainDomain
+            blocklist.set(domains[j], mainDomain)
           }
         }
       }
