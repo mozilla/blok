@@ -1,60 +1,56 @@
-var ip4DecimalPattern = '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$';
-var ip4HexPattern = '^(?:(?:0x[0-9a-f]{1,2})\.){3}(?:0x[0-9a-f]{1,2})$';
-var ip4OctalPattern = '^(?:(?:03[1-7][0-7]|0[12][0-7]{1,2}|[0-7]{1,2})\.){3}(?:03[1-7][0-7]|0[12][0-7]{1,2}|[0-7]{1,2})$';
-
+var ip4DecimalPattern = '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$'
+var ip4HexPattern = '^(?:(?:0x[0-9a-f]{1,2}).){3}(?:0x[0-9a-f]{1,2})$'
+var ip4OctalPattern = '^(?:(?:03[1-7][0-7]|0[12][0-7]{1,2}|[0-7]{1,2}).){3}(?:03[1-7][0-7]|0[12][0-7]{1,2}|[0-7]{1,2})$'
 
 // like trim() helper from underscore.string:
 // trims chars from beginning and end of str
-function trim(str, chars) {
+function trim (str, chars) {
   // escape any regexp chars
-  chars = chars.replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
-  return str.replace(new RegExp('^' + chars + '+|' + chars + '+$', 'g'), '');
+  chars = chars.replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1')
+  return str.replace(new RegExp('^' + chars + '+|' + chars + '+$', 'g'), '')
 }
 
-
 // https://developers.google.com/safe-browsing/v4/urls-hashing#canonicalization
-function canonicalizeHost(host) {
+function canonicalizeHost (host) {
   // Remove all leading and trailing dots
-  var canonicalizedHost = trim(host, '.');
+  var canonicalizedHost = trim(host, '.')
 
   // Replace consecutive dots with a single dot
-  canonicalizedHost = canonicalizedHost.replace(new RegExp('[\.]+', 'g'), '.');
+  canonicalizedHost = canonicalizedHost.replace(new RegExp('[.]+', 'g'), '.')
 
   // If the hostname can be parsed as an IP address,
   // normalize it to 4 dot-separated decimal values.
   // The client should handle any legal IP-address encoding,
   // including octal, hex, and TODO: fewer than four components
-  var base = 10;
-  var isIP4Decimal, isIP4Hex, isIP4Octal;
+  var base = 10
+  var isIP4Decimal, isIP4Hex, isIP4Octal
 
-  isIP4Decimal = canonicalizedHost.match(ip4DecimalPattern) != null;
-  isIP4Hex = canonicalizedHost.match(ip4HexPattern) != null;
-  isIP4Octal = canonicalizedHost.match(ip4OctalPattern) != null;
-  if (isIP4Hex || isIP4Octal) {
+  isIP4Decimal = canonicalizedHost.match(ip4DecimalPattern) != null
+  isIP4Hex = canonicalizedHost.match(ip4HexPattern) != null
+  isIP4Octal = canonicalizedHost.match(ip4OctalPattern) != null
+  if (isIP4Decimal || isIP4Hex || isIP4Octal) {
     if (isIP4Hex) {
-      base = 16;
+      base = 16
     } else if (isIP4Octal) {
-      base = 8;
+      base = 8
     }
-    canonicalizedHost = canonicalizedHost.split('.').map(num => parseInt(num, base)).join('.');
+    canonicalizedHost = canonicalizedHost.split('.').map(num => parseInt(num, base)).join('.')
   }
 
   // Lowercase the whole string
-  canonicalizedHost = canonicalizedHost.toLowerCase();
-  return canonicalizedHost;
+  canonicalizedHost = canonicalizedHost.toLowerCase()
+  return canonicalizedHost
 }
 
-
-function allHosts(host) {
-  const allHosts = [];
-  const hostParts = host.split('.');
+function allHosts (host) {
+  const allHosts = []
+  const hostParts = host.split('.')
   while (hostParts.length > 1) {
-    allHosts.push(hostParts.join('.'));
-    hostParts.splice(0, 1);
+    allHosts.push(hostParts.join('.'))
+    hostParts.splice(0, 1)
   }
-  return allHosts;
+  return allHosts
 }
-
 
 module.exports = {
   allHosts,
