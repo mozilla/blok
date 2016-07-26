@@ -44,6 +44,12 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
     var requestIsThirdParty = false
     var requestHostMatchesMainFrame = false
 
+    // undefined origins are browser internals (e.g., about:newtab)
+    if (typeof requestDetails.originUrl === 'undefined') {
+      totalExecTime[requestTabID] += Date.now() - blockTrackerRequestsStart
+      return {}
+    }
+
     // Determine all origin flags
     originTopHost = canonicalizeHost(new URL(requestDetails.originUrl).host)
     currentActiveOrigin = originTopHost
