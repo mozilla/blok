@@ -28,6 +28,8 @@
     }
   ],
 
+  "homepage_url": "https://testpilot.firefox.com/",
+
   "permissions": [
     "storage",
     "webRequest",
