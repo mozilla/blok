@@ -3,7 +3,7 @@
   "name": "Blok",
   "version": "0.1.4",
 
-  "description": "Implements tracking protection as a web extension add-on.",
+  "description": "Implements tracking protection as a web extension add-on. Learn more about this Test Pilot experiment at https://testpilot.firefox.com/",
   "icons": {
     "48": "icons/blok.png"
   },
