@@ -1,0 +1,43 @@
+{
+  "categories": {
+      "Disconnect": [
+          {
+              "ItIsATracker": {
+                  "https://itisatracker.com/": [
+                      "itisatracker.com",
+                      "trackertest.org"
+                  ]
+              }
+          }
+      ],
+      "Content": [
+          {
+              "Akamai": {
+                  "http://www.akamai.com/": [
+                      "abmr.net",
+                      "akamai.com",
+                      "edgesuite.net"
+                  ]
+              }
+          }
+      ],
+      "Legacy Disconnect": [
+          {
+              "Google": {
+                  "http://www.google.com/": [
+                      "2mdn.net"
+                  ]
+              }
+          }
+      ],
+      "Legacy Content": [
+          {
+              "Yahoo": {
+                  "http://www.yahoo.com/": [
+                      "flickr.com"
+                  ]
+              }
+          }
+      ]
+  }
+}
