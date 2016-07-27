@@ -70,5 +70,6 @@ function getAllowedHostsList () {
 }
 
 module.exports = {
-  loadLists
+  loadLists,
+  processBlockListJSON
 }
