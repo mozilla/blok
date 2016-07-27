@@ -13,6 +13,7 @@
     "coverage": "nyc npm test",
     "firefox": "npm run bundle && web-ext run",
     "lint": "standard && addons-linter ./web-ext-artifacts/*.zip -o text",
+    "postinstall": "cp ./node_modules/foundation-sites/dist/foundation.min.css ./css/foundation.min.css",
     "test": "tape tests/**/*.js | faucet",
     "watch": "npm-watch"
   },
@@ -37,6 +38,7 @@
     "browserify": "13.0.1",
     "envify": "3.4.1",
     "faucet": "0.0.1",
+    "foundation-sites": "6.2.3",
     "npm-watch": "0.1.5",
     "nyc": "7.0.0",
     "standard": "7.1.2",
