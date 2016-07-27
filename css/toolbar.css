@@ -10,6 +10,17 @@ body {
   text-shadow: none;
 }
 
+a {
+  color: #0095dd;
+  color: rgba(0, 149, 221, 1);
+}
+
+a:hover {
+  color: #0095dd;
+  color: rgba(0, 149, 221, 1);
+  text-decoration: underline;
+}
+
 .row {
   max-width: none;
   transition: margin-top 300ms, opacity 300ms;
