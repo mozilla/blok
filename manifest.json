@@ -1,11 +1,11 @@
 {
   "manifest_version": 2,
   "name": "Blok",
-  "version": "0.1.6",
+  "version": "0.1.7",
 
   "description": "Implements tracking protection as a web extension add-on.",
   "icons": {
-    "48": "icons/blok.png"
+    "48": "img/blok.png"
   },
 
   "applications": {
