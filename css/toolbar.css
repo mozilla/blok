@@ -11,19 +11,16 @@ body {
 }
 
 a {
-  color: #0095dd;
-  color: rgba(0, 149, 221, 1);
-}
-
-a:hover {
-  color: #0095dd;
-  color: rgba(0, 149, 221, 1);
-  text-decoration: underline;
+  color: #0996F8;
 }
 
 .row {
   max-width: none;
   transition: margin-top 300ms, opacity 300ms;
+}
+
+.title-column {
+  padding-top: 2px;
 }
 
 .title {
@@ -34,7 +31,8 @@ a:hover {
   color: #111111;
   color: rgba(0,0,0,0.95);
   cursor: default;
-  margin: 0 3px;
+  font-weight: bold;
+  margin: 2px 3px;
   padding: 1px 10px;
   min-height: 16px;
   border-radius: 10000px;
