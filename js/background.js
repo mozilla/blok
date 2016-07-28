@@ -27,6 +27,11 @@ function restartBlokForTab (tabID) {
   mainFrameOriginTopHosts[tabID] = null
 }
 
+function allowRequest (tabID, startDateTime) {
+  totalExecTime[tabID] += Date.now() - startDateTime
+  return {}
+}
+
 function blockTrackerRequests (blocklist, allowedHosts, entityList) {
   return function filterRequest (requestDetails) {
     var blockTrackerRequestsStart = Date.now()
@@ -46,8 +51,7 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
 
     // undefined origins are browser internals (e.g., about:newtab)
     if (typeof requestDetails.originUrl === 'undefined') {
-      totalExecTime[requestTabID] += Date.now() - blockTrackerRequestsStart
-      return {}
+      return allowRequest(requestTabID, blockTrackerRequestsStart)
     }
 
     // Determine all origin flags
@@ -65,8 +69,7 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
 
     // Allow request originating from Firefox and/or new tab/window origins
     if (firefoxOrigin || newOrigin) {
-      totalExecTime[requestTabID] += Date.now() - blockTrackerRequestsStart
-      return {}
+      return allowRequest(requestTabID, blockTrackerRequestsStart)
     }
 
     requestTopHost = canonicalizeHost(new URL(requestDetails.url).host)
@@ -81,8 +84,7 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
 
     // Allow requests to 3rd-party domains NOT in the block-list
     if (!requestHostInBlocklist) {
-      totalExecTime[requestTabID] += Date.now() - blockTrackerRequestsStart
-      return {}
+      return allowRequest(requestTabID, blockTrackerRequestsStart)
     }
 
     requestIsThirdParty = requestTopHost !== originTopHost
@@ -91,8 +93,7 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
       // Allow all requests to the main frame origin domain from child frames' pages
       requestHostMatchesMainFrame = (requestDetails.frameId > 0 && requestTopHost === mainFrameOriginTopHosts[requestTabID])
       if (requestHostMatchesMainFrame) {
-        totalExecTime[requestTabID] += Date.now() - blockTrackerRequestsStart
-        return {}
+        return allowRequest(requestTabID, blockTrackerRequestsStart)
       }
       log(`requestTopHost: ${requestTopHost} does not match originTopHost: ${originTopHost}...`)
 
@@ -125,8 +126,7 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
 
         if ((originIsEntityProperty || mainFrameOriginIsEntityProperty) && requestIsEntityResource) {
           log(`originTopHost ${originTopHost} and resource requestTopHost ${requestTopHost} belong to the same entity: ${entityName}; allowing request`)
-          totalExecTime[requestTabID] += Date.now() - blockTrackerRequestsStart
-          return {}
+          return allowRequest(requestTabID, blockTrackerRequestsStart)
         }
       }
 
@@ -144,7 +144,7 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
         if (allowedEntities[requestTabID].indexOf(requestEntityName) === -1) {
           allowedEntities[requestTabID].push(requestEntityName)
         }
-        return {}
+        return allowRequest(requestTabID, blockTrackerRequestsStart)
       }
 
       blockedRequests[requestTabID].push(requestTopHost)
@@ -162,8 +162,7 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
     }
 
     // none of the above checks matched, so default to allowing the request
-    totalExecTime[requestTabID] += Date.now() - blockTrackerRequestsStart
-    return {}
+    return allowRequest(requestTabID, blockTrackerRequestsStart)
   }
 }
 
