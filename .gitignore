@@ -3,3 +3,4 @@ node_modules
 web-ext-artifacts/*.zip
 css/foundation.min.css
 .nyc_output
+.DS_Store
