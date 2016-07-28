@@ -32,6 +32,30 @@ function allowRequest (tabID, startDateTime) {
   return {}
 }
 
+// check if any host from lowest-level to top-level is in the blocklist
+function hostInBlocklist (blocklist, host) {
+  let requestHostInBlocklist = false
+  var allHostVariants = allHosts(host)
+  for (let hostVariant of allHostVariants) {
+    requestHostInBlocklist = blocklist.has(hostVariant)
+    if (requestHostInBlocklist) {
+      return true
+    }
+  }
+  return false
+}
+
+function hostInEntity (entityHosts, host) {
+  let entityHost = false
+  for (let hostVariant of allHosts(host)) {
+    entityHost = entityHosts.indexOf(hostVariant) > -1
+    if (entityHost) {
+      return true
+    }
+  }
+  return false
+}
+
 function blockTrackerRequests (blocklist, allowedHosts, entityList) {
   return function filterRequest (requestDetails) {
     var blockTrackerRequestsStart = Date.now()
@@ -58,29 +82,21 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
     originTopHost = canonicalizeHost(new URL(requestDetails.originUrl).host)
     currentActiveOrigin = originTopHost
     currentOriginDisabledIndex = allowedHosts.indexOf(currentActiveOrigin)
-
+    currentOriginDisabled = currentOriginDisabledIndex > -1
     if (requestDetails.frameId === 0) {
       mainFrameOriginTopHosts[requestTabID] = originTopHost
     }
 
-    currentOriginDisabled = currentOriginDisabledIndex > -1
+    // Allow request originating from Firefox and/or new tab/window origins
     firefoxOrigin = (typeof originTopHost !== 'undefined' && originTopHost.includes('moz-nullprincipal'))
     newOrigin = originTopHost === ''
-
-    // Allow request originating from Firefox and/or new tab/window origins
     if (firefoxOrigin || newOrigin) {
       return allowRequest(requestTabID, blockTrackerRequestsStart)
     }
 
     requestTopHost = canonicalizeHost(new URL(requestDetails.url).host)
-    // check if any host from lowest-level to top-level is in the blocklist
-    var allRequestHosts = allHosts(requestTopHost)
-    for (let requestHost of allRequestHosts) {
-      requestHostInBlocklist = blocklist.has(requestHost)
-      if (requestHostInBlocklist) {
-        break
-      }
-    }
+
+    requestHostInBlocklist = hostInBlocklist(blocklist, requestTopHost)
 
     // Allow requests to 3rd-party domains NOT in the block-list
     if (!requestHostInBlocklist) {
@@ -103,26 +119,14 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
         var originIsEntityProperty = false
         var mainFrameOriginIsEntityProperty = false
 
-        for (let requestHost of allHosts(requestTopHost)) {
-          requestIsEntityResource = entity.resources.indexOf(requestHost) > -1
-          if (requestIsEntityResource) {
-            requestEntityName = entityName
-            break
-          }
-        }
-        for (let originHost of allHosts(originTopHost)) {
-          originIsEntityProperty = entity.properties.indexOf(originHost) > -1
-          if (originIsEntityProperty) {
-            break
-          }
+        requestIsEntityResource = hostInEntity(entity.resources, requestTopHost)
+        if (requestIsEntityResource) {
+          requestEntityName = entityName
         }
 
-        for (let mainFrameOriginHost of allHosts(mainFrameOriginTopHosts[requestTabID])) {
-          mainFrameOriginIsEntityProperty = entity.properties.indexOf(mainFrameOriginHost) > -1
-          if (mainFrameOriginIsEntityProperty) {
-            break
-          }
-        }
+        originIsEntityProperty = hostInEntity(entity.properties, originTopHost)
+
+        mainFrameOriginIsEntityProperty = hostInEntity(entity.properties, mainFrameOriginTopHosts[requestTabID])
 
         if ((originIsEntityProperty || mainFrameOriginIsEntityProperty) && requestIsEntityResource) {
           log(`originTopHost ${originTopHost} and resource requestTopHost ${requestTopHost} belong to the same entity: ${entityName}; allowing request`)
