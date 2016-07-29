@@ -1,5 +1,5 @@
 var test = require('tape')
-var {allHosts, canonicalizeHost} = require('../js/canonicalize')
+var {canonicalizeHost} = require('../js/canonicalize')
 
 test('canonicalizeHost plain host is plain', function (t) {
   t.plan(1)
@@ -39,21 +39,4 @@ test('canonicalizeHost lowercase everything', function (t) {
 test('canonicalizeHost test everything together', function (t) {
   t.plan(1)
   t.equal(canonicalizeHost('..TRACK..TrackerTest.Org.'), 'track.trackertest.org')
-})
-
-test('allHosts returns single element for trackertest.org', function (t) {
-  t.plan(1)
-  t.deepEqual(allHosts('trackertest.org'), ['trackertest.org'])
-})
-
-test('allHosts returns multiple elements for tracky.track.trackertest.org', function (t) {
-  t.plan(1)
-  t.deepEqual(
-    allHosts('tracky.track.trackertest.org'),
-    [
-      'tracky.track.trackertest.org',
-      'track.trackertest.org',
-      'trackertest.org'
-    ]
-  )
 })

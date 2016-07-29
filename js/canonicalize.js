@@ -42,18 +42,7 @@ function canonicalizeHost (host) {
   return canonicalizedHost
 }
 
-function allHosts (host) {
-  const allHosts = []
-  const hostParts = host.split('.')
-  while (hostParts.length > 1) {
-    allHosts.push(hostParts.join('.'))
-    hostParts.splice(0, 1)
-  }
-  return allHosts
-}
-
 module.exports = {
-  allHosts,
   canonicalizeHost,
   trim
 }

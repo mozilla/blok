@@ -1,3 +1,13 @@
+function allHosts (host) {
+  const allHosts = []
+  const hostParts = host.split('.')
+  while (hostParts.length > 1) {
+    allHosts.push(hostParts.join('.'))
+    hostParts.splice(0, 1)
+  }
+  return allHosts
+}
+
 function loadLists (state) {
   const blockListPromise = loadJSON('disconnect-blocklist.json').then((data) => {
     state.blocklist = processBlockListJSON(data)
@@ -69,7 +79,35 @@ function getAllowedHostsList () {
   })
 }
 
+// check if any host from lowest-level to top-level is in the blocklist
+function hostInBlocklist (blocklist, host) {
+  let requestHostInBlocklist = false
+  var allHostVariants = allHosts(host)
+  for (let hostVariant of allHostVariants) {
+    requestHostInBlocklist = blocklist.has(hostVariant)
+    if (requestHostInBlocklist) {
+      return true
+    }
+  }
+  return false
+}
+
+// check if any host from lowest-level to top-level is in the entitylist
+function hostInEntity (entityHosts, host) {
+  let entityHost = false
+  for (let hostVariant of allHosts(host)) {
+    entityHost = entityHosts.indexOf(hostVariant) > -1
+    if (entityHost) {
+      return true
+    }
+  }
+  return false
+}
+
 module.exports = {
+  allHosts,
   loadLists,
-  processBlockListJSON
+  processBlockListJSON,
+  hostInBlocklist,
+  hostInEntity
 }
