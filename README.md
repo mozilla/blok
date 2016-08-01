@@ -18,7 +18,7 @@ When we have breakage data and user feedback, we will change the tracking protec
 ## Run it
 
 1. Go to `about:config` and set `xpinstall.signatures.required` to `false`
-2. [Download the `.xpi`](https://github.com/mozilla/blok/raw/master/web-ext-artifacts/blok-0.1.xpi)
+2. [Download the `.xpi`](https://github.com/mozilla/blok/blob/master/web-ext-artifacts/blok-0.1-fx.xpi?raw=true)
 3. In Firefox, "Open File" and select the `.xpi`
 
 When the add-on blocks tracker requests, you will see a Blok notification bar
