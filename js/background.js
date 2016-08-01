@@ -1,9 +1,7 @@
-var {allHosts, canonicalizeHost} = require('./canonicalize')
-const {loadLists} = require('./lists')
+var {canonicalizeHost} = require('./canonicalize')
+const {loadLists, hostInBlocklist, hostInEntity} = require('./lists')
+const {allowRequest} = require('./requests')
 const {log} = require('./log')
-
-var TESTPILOT_TELEMETRY_CHANNEL = 'testpilot-telemetry'
-var testpilotPingChannel = new BroadcastChannel(TESTPILOT_TELEMETRY_CHANNEL)
 
 // HACK: Start with active tab id = 1 when browser starts
 var currentActiveTabID = 1
@@ -46,43 +44,32 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
 
     // undefined origins are browser internals (e.g., about:newtab)
     if (typeof requestDetails.originUrl === 'undefined') {
-      totalExecTime[requestTabID] += Date.now() - blockTrackerRequestsStart
-      return {}
+      return allowRequest(requestTabID, totalExecTime, blockTrackerRequestsStart)
     }
 
     // Determine all origin flags
     originTopHost = canonicalizeHost(new URL(requestDetails.originUrl).host)
     currentActiveOrigin = originTopHost
     currentOriginDisabledIndex = allowedHosts.indexOf(currentActiveOrigin)
-
+    currentOriginDisabled = currentOriginDisabledIndex > -1
     if (requestDetails.frameId === 0) {
       mainFrameOriginTopHosts[requestTabID] = originTopHost
     }
 
-    currentOriginDisabled = currentOriginDisabledIndex > -1
+    // Allow request originating from Firefox and/or new tab/window origins
     firefoxOrigin = (typeof originTopHost !== 'undefined' && originTopHost.includes('moz-nullprincipal'))
     newOrigin = originTopHost === ''
-
-    // Allow request originating from Firefox and/or new tab/window origins
     if (firefoxOrigin || newOrigin) {
-      totalExecTime[requestTabID] += Date.now() - blockTrackerRequestsStart
-      return {}
+      return allowRequest(requestTabID, totalExecTime, blockTrackerRequestsStart)
     }
 
     requestTopHost = canonicalizeHost(new URL(requestDetails.url).host)
-    // check if any host from lowest-level to top-level is in the blocklist
-    var allRequestHosts = allHosts(requestTopHost)
-    for (let requestHost of allRequestHosts) {
-      requestHostInBlocklist = blocklist.has(requestHost)
-      if (requestHostInBlocklist) {
-        break
-      }
-    }
+
+    requestHostInBlocklist = hostInBlocklist(blocklist, requestTopHost)
 
     // Allow requests to 3rd-party domains NOT in the block-list
     if (!requestHostInBlocklist) {
-      totalExecTime[requestTabID] += Date.now() - blockTrackerRequestsStart
-      return {}
+      return allowRequest(requestTabID, totalExecTime, blockTrackerRequestsStart)
     }
 
     requestIsThirdParty = requestTopHost !== originTopHost
@@ -91,8 +78,7 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
       // Allow all requests to the main frame origin domain from child frames' pages
       requestHostMatchesMainFrame = (requestDetails.frameId > 0 && requestTopHost === mainFrameOriginTopHosts[requestTabID])
       if (requestHostMatchesMainFrame) {
-        totalExecTime[requestTabID] += Date.now() - blockTrackerRequestsStart
-        return {}
+        return allowRequest(requestTabID, totalExecTime, blockTrackerRequestsStart)
       }
       log(`requestTopHost: ${requestTopHost} does not match originTopHost: ${originTopHost}...`)
 
@@ -102,31 +88,18 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
         var originIsEntityProperty = false
         var mainFrameOriginIsEntityProperty = false
 
-        for (let requestHost of allHosts(requestTopHost)) {
-          requestIsEntityResource = entity.resources.indexOf(requestHost) > -1
-          if (requestIsEntityResource) {
-            requestEntityName = entityName
-            break
-          }
-        }
-        for (let originHost of allHosts(originTopHost)) {
-          originIsEntityProperty = entity.properties.indexOf(originHost) > -1
-          if (originIsEntityProperty) {
-            break
-          }
+        requestIsEntityResource = hostInEntity(entity.resources, requestTopHost)
+        if (requestIsEntityResource) {
+          requestEntityName = entityName
         }
 
-        for (let mainFrameOriginHost of allHosts(mainFrameOriginTopHosts[requestTabID])) {
-          mainFrameOriginIsEntityProperty = entity.properties.indexOf(mainFrameOriginHost) > -1
-          if (mainFrameOriginIsEntityProperty) {
-            break
-          }
-        }
+        originIsEntityProperty = hostInEntity(entity.properties, originTopHost)
+
+        mainFrameOriginIsEntityProperty = hostInEntity(entity.properties, mainFrameOriginTopHosts[requestTabID])
 
         if ((originIsEntityProperty || mainFrameOriginIsEntityProperty) && requestIsEntityResource) {
           log(`originTopHost ${originTopHost} and resource requestTopHost ${requestTopHost} belong to the same entity: ${entityName}; allowing request`)
-          totalExecTime[requestTabID] += Date.now() - blockTrackerRequestsStart
-          return {}
+          return allowRequest(requestTabID, totalExecTime, blockTrackerRequestsStart)
         }
       }
 
@@ -144,7 +117,7 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
         if (allowedEntities[requestTabID].indexOf(requestEntityName) === -1) {
           allowedEntities[requestTabID].push(requestEntityName)
         }
-        return {}
+        return allowRequest(requestTabID, totalExecTime, blockTrackerRequestsStart)
       }
 
       blockedRequests[requestTabID].push(requestTopHost)
@@ -162,12 +135,11 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
     }
 
     // none of the above checks matched, so default to allowing the request
-    totalExecTime[requestTabID] += Date.now() - blockTrackerRequestsStart
-    return {}
+    return allowRequest(requestTabID, totalExecTime, blockTrackerRequestsStart)
   }
 }
 
-function startListeners ({blocklist, allowedHosts, entityList}) {
+function startListeners ({blocklist, allowedHosts, entityList}, testPilotPingChannel) {
   browser.webRequest.onBeforeRequest.addListener(
     blockTrackerRequests(blocklist, allowedHosts, entityList),
     {urls: ['*://*/*']},
@@ -208,7 +180,7 @@ function startListeners ({blocklist, allowedHosts, entityList}) {
         feedback: message.feedback
       }
       log('telemetry ping payload: ' + JSON.stringify(testPilotPingMessage))
-      testpilotPingChannel.postMessage(testPilotPingMessage)
+      testPilotPingChannel.postMessage(testPilotPingMessage)
       log('mainFrameOriginTopHosts[currentActiveTabID]: ' + mainFrameOriginTopHosts[currentActiveTabID])
       browser.tabs.sendMessage(currentActiveTabID, {
         'feedback': message.feedback,
@@ -223,7 +195,7 @@ function startListeners ({blocklist, allowedHosts, entityList}) {
         notes: message.notes
       }
       log('telemetry ping payload: ' + JSON.stringify(testPilotPingMessage))
-      testpilotPingChannel.postMessage(testPilotPingMessage)
+      testPilotPingChannel.postMessage(testPilotPingMessage)
       browser.tabs.sendMessage(currentActiveTabID, message)
     }
     if (message === 'close-feedback') {
@@ -238,6 +210,13 @@ const state = {
   entityList: {}
 }
 
+function initTestPilotPingChannel ({BroadcastChannel}) {
+  let TESTPILOT_TELEMETRY_CHANNEL = 'testpilot-telemetry'
+  let testPilotPingChannel = new BroadcastChannel(TESTPILOT_TELEMETRY_CHANNEL)
+  return testPilotPingChannel
+}
+
 loadLists(state).then(() => {
-  startListeners(state)
+  let testPilotPingChannel = initTestPilotPingChannel(window)
+  startListeners(state, testPilotPingChannel)
 }, console.error.bind(console))
