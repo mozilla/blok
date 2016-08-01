@@ -3,8 +3,7 @@ const {loadLists, hostInBlocklist, hostInEntity} = require('./lists')
 const {allowRequest} = require('./requests')
 const {log} = require('./log')
 
-// HACK: Start with active tab id = 1 when browser starts
-var currentActiveTabID = 1
+var currentActiveTabID
 var currentOriginDisabledIndex = -1
 var currentActiveOrigin
 var blockedRequests = {}
@@ -145,6 +144,13 @@ function startListeners ({blocklist, allowedHosts, entityList}, testPilotPingCha
     {urls: ['*://*/*']},
     ['blocking']
   )
+
+  browser.windows.onFocusChanged.addListener((windowID) => {
+    log('browser.windows.onFocusChanged, windowID: ' + windowID)
+    browser.tabs.query({active: true, windowId: windowID}, (tabsArray) => {
+      currentActiveTabID = tabsArray[0].id
+    })
+  })
 
   browser.tabs.onActivated.addListener(function (activeInfo) {
     currentActiveTabID = activeInfo.tabId
