@@ -14,7 +14,9 @@
     "firefox": "npm run bundle && web-ext run",
     "lint": "standard && web-ext lint",
     "postinstall": "cp ./node_modules/foundation-sites/dist/foundation.min.css ./css/foundation.min.css",
+    "sign": "web-ext sign",
     "test": "tape tests/**/*.js | faucet",
+    "update-version": "./bin/update-version",
     "watch": "npm-watch"
   },
   "repository": {

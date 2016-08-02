@@ -12,3 +12,7 @@ before_install:
 script:
     - npm run build
     - npm run lint
+
+before_deploy:
+    - npm run update-version
+    - npm run sign
