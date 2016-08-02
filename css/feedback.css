@@ -33,6 +33,14 @@
   padding: 1em;
 }
 
+.blok-hide {
+  display: none;
+}
+
+#breakage-required {
+  color: #ec5840;
+}
+
 input[type="radio"] {
   margin: 0;
 }
