@@ -1,13 +1,15 @@
 var feedbackModalOverlay
 var toolbarFrame
+var toolbarSpacer
 
-toolbarFrame = document.getElementById('blok-toolbar-iframe')
 feedbackModalOverlay = document.getElementById('blok-feedback-modal-overlay')
+toolbarFrame = document.getElementById('blok-toolbar-iframe')
+toolbarSpacer = document.getElementById('blok-toolbar-spacer')
 
 browser.runtime.onMessage.addListener(function (message) {
   // Any message indicates Blok has something to show
-  if (!toolbarFrame) {
-    var toolbarSpacer = document.createElement('div')
+  if (!toolbarFrame && !toolbarSpacer) {
+    toolbarSpacer = document.createElement('div')
     toolbarSpacer.setAttribute('id', 'blok-toolbar-spacer')
     toolbarSpacer.setAttribute('class', 'blok-toolbar-spacer')
     var bodyEl = document.getElementsByTagName('body')[0]
@@ -41,6 +43,11 @@ browser.runtime.onMessage.addListener(function (message) {
     feedbackModalOverlay.querySelector('#blok-feedback-iframe').contentDocument.querySelector('#feedback-title-site-name').textContent = message.origin
   } else if (message.feedback && message.feedback === 'page-works') {
     feedbackModalOverlay.remove()
+  }
+
+  if (message === 'close-toolbar') {
+    toolbarFrame.remove()
+    toolbarSpacer.remove()
   }
 
   if (message === 'close-feedback') {
