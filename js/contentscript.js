@@ -8,7 +8,7 @@ toolbarSpacer = document.getElementById('blok-toolbar-spacer')
 
 browser.runtime.onMessage.addListener(function (message) {
   // Any message indicates Blok has something to show
-  if (!toolbarFrame && !toolbarSpacer) {
+  if (!toolbarFrame) {
     toolbarSpacer = document.createElement('div')
     toolbarSpacer.setAttribute('id', 'blok-toolbar-spacer')
     toolbarSpacer.setAttribute('class', 'blok-toolbar-spacer')
