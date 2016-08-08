@@ -204,6 +204,9 @@ function startListeners ({blocklist, allowedHosts, entityList}, testPilotPingCha
       testPilotPingChannel.postMessage(testPilotPingMessage)
       browser.tabs.sendMessage(currentActiveTabID, message)
     }
+    if (message === 'close-toolbar') {
+      browser.tabs.sendMessage(currentActiveTabID, message)
+    }
     if (message === 'close-feedback') {
       browser.tabs.sendMessage(currentActiveTabID, message)
     }

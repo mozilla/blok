@@ -23,6 +23,10 @@ document.querySelector('#re-enable-link').addEventListener('click', function () 
   browser.runtime.sendMessage('re-enable')
 })
 
+document.querySelector('#close-btn').addEventListener('click', function () {
+  browser.runtime.sendMessage('close-toolbar')
+})
+
 for (let feedbackBtn of document.querySelectorAll('.feedback-btn')) {
   feedbackBtn.addEventListener('click', function (event) {
     var feedback = event.target.dataset.feedback
