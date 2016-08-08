@@ -35,7 +35,22 @@ Blok will use Test Pilot's Telemetry wrapper with no batching of data.  Details
 of when pings are sent are below, along with examples of the `payload` portion
 of a `testpilottest` telemetry ping for each scenario.
 
-* The user clicks the button in the notification bar that the page works
+* The user clicks "This page works well" button in the notification bar
+
+In this case `breakage` and `notes` are empty.
+
+```js
+  {
+    "originDomain": "www.redditmedia.com",
+    "trackerDomains": ["ssl.google-analytics.com",
+                       "z.moatads.com"],
+    "breakage": "",
+    "notes": "",
+    "event": "page-works"
+  }
+```
+
+* The user clicks "Report a problem" button in the notification bar
 
 In this case `breakage` and `notes` are also always empty.
 
@@ -46,7 +61,7 @@ In this case `breakage` and `notes` are also always empty.
                        "z.moatads.com"],
     "breakage": "",
     "notes": "",
-    "event": "submit"
+    "event": "page-problem"
   }
 ```
 
