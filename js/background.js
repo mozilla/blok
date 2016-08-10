@@ -1,6 +1,6 @@
 var {canonicalizeHost} = require('./canonicalize')
 const {loadLists, hostInBlocklist, hostInEntity} = require('./lists')
-const {allowRequest} = require('./requests')
+const {requestAllower} = require('./requests')
 const {log} = require('./log')
 
 var currentActiveTabID
@@ -30,27 +30,29 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList, reportedHost
     var requestTabID = requestDetails.tabId
     var originTopHost
     var requestTopHost
-
-    // Start with all origin flags false
-    var currentOriginDisabled = false
-    var firefoxOrigin = false
-    var newOrigin = false
-
     var requestEntityName
-    var requestHostInBlocklist = false
-    var requestIsThirdParty = false
-    var requestHostMatchesMainFrame = false
+
+    var flags = {
+      currentOriginDisabled: false,
+      firefoxOrigin: false,
+      newOrigin: false,
+      requestHostInBlocklist: false,
+      requestIsThirdParty: false,
+      requestHostMatchesMainFrame: false
+    }
+
+    var allowRequest = requestAllower.bind(null, requestTabID, totalExecTime, blockTrackerRequestsStart)
 
     // undefined origins are browser internals (e.g., about:newtab)
     if (typeof requestDetails.originUrl === 'undefined') {
-      return allowRequest(requestTabID, totalExecTime, blockTrackerRequestsStart)
+      return allowRequest()
     }
 
     // Determine all origin flags
     originTopHost = canonicalizeHost(new URL(requestDetails.originUrl).host)
     currentActiveOrigin = originTopHost
-    currentOriginDisabledIndex = allowedHosts.indexOf(currentActiveOrigin)
-    currentOriginDisabled = currentOriginDisabledIndex > -1
+    flags.currentOriginDisabledIndex = allowedHosts.indexOf(currentActiveOrigin)
+    flags.currentOriginDisabled = currentOriginDisabledIndex > -1
     if (requestDetails.frameId === 0) {
       mainFrameOriginTopHosts[requestTabID] = originTopHost
       if (currentOriginDisabled) {
@@ -70,28 +72,28 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList, reportedHost
     }
 
     // Allow request originating from Firefox and/or new tab/window origins
-    firefoxOrigin = (typeof originTopHost !== 'undefined' && originTopHost.includes('moz-nullprincipal'))
-    newOrigin = originTopHost === ''
-    if (firefoxOrigin || newOrigin) {
-      return allowRequest(requestTabID, totalExecTime, blockTrackerRequestsStart)
+    flags.firefoxOrigin = (typeof originTopHost !== 'undefined' && originTopHost.includes('moz-nullprincipal'))
+    flags.newOrigin = originTopHost === ''
+    if (flags.firefoxOrigin || flags.newOrigin) {
+      return allowRequest()
     }
 
     requestTopHost = canonicalizeHost(new URL(requestDetails.url).host)
 
-    requestHostInBlocklist = hostInBlocklist(blocklist, requestTopHost)
+    flags.requestHostInBlocklist = hostInBlocklist(blocklist, requestTopHost)
 
     // Allow requests to 3rd-party domains NOT in the block-list
-    if (!requestHostInBlocklist) {
-      return allowRequest(requestTabID, totalExecTime, blockTrackerRequestsStart)
+    if (!flags.requestHostInBlocklist) {
+      return allowRequest()
     }
 
-    requestIsThirdParty = requestTopHost !== originTopHost
+    flags.requestIsThirdParty = requestTopHost !== originTopHost
 
-    if (requestIsThirdParty) {
+    if (flags.requestIsThirdParty) {
       // Allow all requests to the main frame origin domain from child frames' pages
-      requestHostMatchesMainFrame = (requestDetails.frameId > 0 && requestTopHost === mainFrameOriginTopHosts[requestTabID])
-      if (requestHostMatchesMainFrame) {
-        return allowRequest(requestTabID, totalExecTime, blockTrackerRequestsStart)
+      flags.requestHostMatchesMainFrame = (requestDetails.frameId > 0 && requestTopHost === mainFrameOriginTopHosts[requestTabID])
+      if (flags.requestHostMatchesMainFrame) {
+        return allowRequest()
       }
       log(`requestTopHost: ${requestTopHost} does not match originTopHost: ${originTopHost}...`)
 
@@ -112,19 +114,19 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList, reportedHost
 
         if ((originIsEntityProperty || mainFrameOriginIsEntityProperty) && requestIsEntityResource) {
           log(`originTopHost ${originTopHost} and resource requestTopHost ${requestTopHost} belong to the same entity: ${entityName}; allowing request`)
-          return allowRequest(requestTabID, totalExecTime, blockTrackerRequestsStart)
+          return allowRequest()
         }
       }
 
       // Allow request if the origin has been added to allowedHosts
-      if (currentOriginDisabled) {
+      if (flags.currentOriginDisabled) {
         log('Protection disabled for this site; allowing request.')
         allowedRequests[requestTabID].push(requestTopHost)
         if (allowedEntities[requestTabID].indexOf(requestEntityName) === -1) {
           allowedEntities[requestTabID].push(requestEntityName)
         }
         browser.pageAction.show(requestTabID)
-        return allowRequest(requestTabID, totalExecTime, blockTrackerRequestsStart)
+        return allowRequest()
       }
 
       blockedRequests[requestTabID].push(requestTopHost)
@@ -143,7 +145,7 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList, reportedHost
     }
 
     // none of the above checks matched, so default to allowing the request
-    return allowRequest(requestTabID, totalExecTime, blockTrackerRequestsStart)
+    return allowRequest()
   }
 }
 
