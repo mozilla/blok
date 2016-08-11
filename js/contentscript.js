@@ -18,7 +18,7 @@ browser.runtime.onMessage.addListener(function (message) {
     toolbarFrame = document.createElement('iframe')
     toolbarFrame.setAttribute('id', 'blok-toolbar-iframe')
     toolbarFrame.setAttribute('class', 'blok-toolbar-iframe')
-    toolbarFrame.setAttribute('src', browser.runtime.getURL('toolbar.html'))
+    toolbarFrame.setAttribute('src', browser.runtime.getURL('html/toolbar.html'))
     document.body.appendChild(toolbarFrame)
   }
 
@@ -29,7 +29,7 @@ browser.runtime.onMessage.addListener(function (message) {
     let feedbackFrame = document.createElement('iframe')
     feedbackFrame.setAttribute('id', 'blok-feedback-iframe')
     feedbackFrame.setAttribute('class', 'blok-feedback-iframe')
-    feedbackFrame.setAttribute('src', browser.runtime.getURL('feedback.html'))
+    feedbackFrame.setAttribute('src', browser.runtime.getURL('html/feedback.html'))
 
     feedbackModalOverlay.appendChild(feedbackFrame)
     document.body.appendChild(feedbackModalOverlay)
