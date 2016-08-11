@@ -19,16 +19,15 @@
     "scripts": ["js/background.bundle.js"]
   },
 
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["/js/contentscript.js"],
-      "css": ["/css/contentscript.css"],
-      "run_at": "document_start"
-    }
-  ],
-
   "homepage_url": "https://testpilot.firefox.com/",
+
+  "page_action": {
+    "default_icon": {
+      "19": "img/tracking-protection-16.png"
+    },
+    "default_title": "Blok",
+    "default_popup": "html/toolbar.html"
+  },
 
   "permissions": [
     "storage",

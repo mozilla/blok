@@ -5,13 +5,13 @@ const {log} = require('./log')
 
 var currentActiveTabID
 var currentOriginDisabledIndex = -1
+window.topFrameHostDisabled = false
 var currentActiveOrigin
 var blockedRequests = {}
 var blockedEntities = {}
 var allowedRequests = {}
 var allowedEntities = {}
 var totalExecTime = {}
-var reasonsGiven = {}
 var mainFrameOriginTopHosts = {}
 
 function restartBlokForTab (tabID) {
@@ -20,7 +20,6 @@ function restartBlokForTab (tabID) {
   allowedRequests[tabID] = []
   allowedEntities[tabID] = []
   totalExecTime[tabID] = 0
-  reasonsGiven[tabID] = null
   mainFrameOriginTopHosts[tabID] = null
 }
 
@@ -50,9 +49,23 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
     originTopHost = canonicalizeHost(new URL(requestDetails.originUrl).host)
     currentActiveOrigin = originTopHost
     currentOriginDisabledIndex = allowedHosts.indexOf(currentActiveOrigin)
+    console.log('currentActiveOrigin: ' + currentActiveOrigin)
     currentOriginDisabled = currentOriginDisabledIndex > -1
+    console.log('currentOriginDisabled: ' + currentOriginDisabled)
     if (requestDetails.frameId === 0) {
+      console.log('frameId === 0')
       mainFrameOriginTopHosts[requestTabID] = originTopHost
+      if (currentOriginDisabled) {
+        console.log('setting topFrameHostDisabled true')
+        window.topFrameHostDisabled = true
+        console.log('window.topFrameHostDisabled: ' + window.topFrameHostDisabled)
+        browser.pageAction.setIcon({
+          tabId: requestTabID,
+          path: 'img/tracking-protection-disabled-16.png'
+        })
+      } else {
+        window.topFrameHostDisabled = false
+      }
     }
 
     // Allow request originating from Firefox and/or new tab/window origins
@@ -105,17 +118,11 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
       // Allow request if the origin has been added to allowedHosts
       if (currentOriginDisabled) {
         log('Protection disabled for this site; allowing request.')
-        browser.tabs.sendMessage(requestTabID,
-          {
-            'origin-disabled': originTopHost,
-            'reason-given': reasonsGiven[requestTabID],
-            'allowedEntities': allowedEntities[requestTabID]
-          }
-        )
         allowedRequests[requestTabID].push(requestTopHost)
         if (allowedEntities[requestTabID].indexOf(requestEntityName) === -1) {
           allowedEntities[requestTabID].push(requestEntityName)
         }
+        browser.pageAction.show(requestTabID)
         return allowRequest(requestTabID, totalExecTime, blockTrackerRequestsStart)
       }
 
@@ -130,6 +137,7 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
         blockedEntities: blockedEntities[requestTabID]
       })
 
+      browser.pageAction.show(requestTabID)
       return {cancel: true}
     }
 
@@ -170,11 +178,19 @@ function startListeners ({blocklist, allowedHosts, entityList}, testPilotPingCha
 
   browser.runtime.onMessage.addListener(function (message) {
     if (message === 'disable') {
-      allowedHosts.push(currentActiveOrigin)
+      browser.pageAction.setIcon({
+        tabId: currentActiveTabID,
+        path: 'img/tracking-protection-disabled-16.png'
+      })
+      allowedHosts.push(mainFrameOriginTopHosts[currentActiveTabID])
       browser.storage.local.set({allowedHosts: allowedHosts})
       browser.tabs.reload(currentActiveTabID)
     }
     if (message === 're-enable') {
+      browser.pageAction.setIcon({
+        tabId: currentActiveTabID,
+        path: 'img/tracking-protection-16.png'
+      })
       allowedHosts.splice(currentOriginDisabledIndex, 1)
       browser.storage.local.set({allowedHosts: allowedHosts})
       browser.tabs.reload(currentActiveTabID)
