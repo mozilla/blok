@@ -1,6 +1,6 @@
 var {canonicalizeHost} = require('./canonicalize')
-const {loadLists, hostInBlocklist, hostInEntity} = require('./lists')
-const {requestAllower} = require('./requests')
+const {loadLists, hostInBlocklist} = require('./lists')
+const {requestAllower, getRequestEntity} = require('./requests')
 const {log} = require('./log')
 
 var currentActiveTabID
@@ -30,7 +30,7 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList, reportedHost
     var requestTabID = requestDetails.tabId
     var originTopHost
     var requestTopHost
-    var requestEntityName
+    var requestEntity
 
     var flags = {
       currentOriginDisabled: false,
@@ -97,41 +97,25 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList, reportedHost
       }
       log(`requestTopHost: ${requestTopHost} does not match originTopHost: ${originTopHost}...`)
 
-      for (let entityName in entityList) {
-        var entity = entityList[entityName]
-        var requestIsEntityResource = false
-        var originIsEntityProperty = false
-        var mainFrameOriginIsEntityProperty = false
-
-        requestIsEntityResource = hostInEntity(entity.resources, requestTopHost)
-        if (requestIsEntityResource) {
-          requestEntityName = entityName
-        }
-
-        originIsEntityProperty = hostInEntity(entity.properties, originTopHost)
-
-        mainFrameOriginIsEntityProperty = hostInEntity(entity.properties, mainFrameOriginTopHosts[requestTabID])
-
-        if ((originIsEntityProperty || mainFrameOriginIsEntityProperty) && requestIsEntityResource) {
-          log(`originTopHost ${originTopHost} and resource requestTopHost ${requestTopHost} belong to the same entity: ${entityName}; allowing request`)
-          return allowRequest()
-        }
+      requestEntity = getRequestEntity(entityList, originTopHost, requestTopHost, mainFrameOriginTopHosts[requestTabID])
+      if (requestEntity.sameEntity) {
+        return allowRequest()
       }
 
       // Allow request if the origin has been added to allowedHosts
       if (flags.currentOriginDisabled) {
         log('Protection disabled for this site; allowing request.')
         allowedRequests[requestTabID].push(requestTopHost)
-        if (allowedEntities[requestTabID].indexOf(requestEntityName) === -1) {
-          allowedEntities[requestTabID].push(requestEntityName)
+        if (allowedEntities[requestTabID].indexOf(requestEntity.entityName) === -1) {
+          allowedEntities[requestTabID].push(requestEntity.entityName)
         }
         browser.pageAction.show(requestTabID)
         return allowRequest()
       }
 
       blockedRequests[requestTabID].push(requestTopHost)
-      if (blockedEntities[requestTabID].indexOf(requestEntityName) === -1) {
-        blockedEntities[requestTabID].push(requestEntityName)
+      if (blockedEntities[requestTabID].indexOf(requestEntity.entityName) === -1) {
+        blockedEntities[requestTabID].push(requestEntity.entityName)
       }
 
       totalExecTime[requestTabID] += Date.now() - blockTrackerRequestsStart

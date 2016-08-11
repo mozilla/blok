@@ -1,6 +1,8 @@
 # Blok
 
 [![Build Status](https://travis-ci.org/mozilla/blok.svg?branch=master)](https://travis-ci.org/mozilla/blok)
+[![Coverage
+Status](https://coveralls.io/repos/github/mozilla/blok/badge.svg)](https://coveralls.io/github/mozilla/blok)
 
 [Web Extension](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/) re-implementation of [Tracking Protection for Firefox](https://support.mozilla.org/en-US/kb/tracking-protection-pbm).
 
