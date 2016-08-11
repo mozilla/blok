@@ -9,11 +9,11 @@ function allHosts (host) {
 }
 
 function loadLists (state) {
-  const blockListPromise = loadJSON('disconnect-blocklist.json').then((data) => {
+  const blockListPromise = loadJSON('js/disconnect-blocklist.json').then((data) => {
     state.blocklist = processBlockListJSON(data)
   })
 
-  const entityListPromise = loadJSON('disconnect-entitylist.json').then((data) => {
+  const entityListPromise = loadJSON('js/disconnect-entitylist.json').then((data) => {
     state.entityList = data
   })
 

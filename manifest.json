@@ -37,8 +37,8 @@
   ],
 
   "web_accessible_resources": [
-    "toolbar.html",
-    "feedback.html"
+    "html/toolbar.html",
+    "html/feedback.html"
   ]
 
 }
