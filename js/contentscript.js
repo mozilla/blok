@@ -18,7 +18,7 @@ browser.runtime.onMessage.addListener(function (message) {
     toolbarFrame = document.createElement('iframe')
     toolbarFrame.setAttribute('id', 'blok-toolbar-iframe')
     toolbarFrame.setAttribute('class', 'blok-toolbar-iframe')
-    toolbarFrame.setAttribute('src', browser.runtime.getURL('html/toolbar.html'))
+    toolbarFrame.setAttribute('src', browser.runtime.getURL('html/popup.html'))
     document.body.appendChild(toolbarFrame)
   }
 

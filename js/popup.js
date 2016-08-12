@@ -1,17 +1,23 @@
-function setDisabledUI () {
-  document.querySelector('#title-blocking').className = 'hide'
-  document.querySelector('#title-disabled').className = 'title'
-  for (let feedbackElement of document.querySelectorAll('.feedback')) {
-    feedbackElement.className = 'feedback hide'
+function hideClass (className) {
+  for (let blockingElement of document.querySelectorAll('.' + className)) {
+    blockingElement.className = className + ' hide'
   }
 }
 
-function setEnabledUI () {
-  document.querySelector('#title-blocking').className = 'title'
-  document.querySelector('#title-disabled').className = 'hide'
-  for (let feedbackElement of document.querySelectorAll('.feedback')) {
-    feedbackElement.className = 'feedback'
+function showClass (className) {
+  for (let disabledElement of document.querySelectorAll('.' + className)) {
+    disabledElement.className = className
   }
+}
+
+function setDisabledUI () {
+  hideClass('blocking')
+  showClass('disabled')
+}
+
+function setEnabledUI () {
+  hideClass('disabled')
+  showClass('blocking')
 }
 
 browser.runtime.getBackgroundPage((bgPage) => {

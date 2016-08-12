@@ -1,8 +1,5 @@
 body {
-  color: #eeeeee;
-  color: rgba(255, 255, 255, 0.95);
   cursor: default;
-  background: linear-gradient(#606060, #404040);
   font-family: -apple-system;
   font-size: 11px;
   overflow: hidden;
@@ -18,18 +15,6 @@ a {
 .row {
   max-width: none;
   transition: margin-top 300ms, opacity 300ms;
-}
-
-.title-column {
-  padding-top: 2px;
-}
-
-.title {
-  font-weight: bold;
-}
-
-.title-img {
-  margin-bottom: 2px;
 }
 
 .button {

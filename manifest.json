@@ -26,18 +26,13 @@
       "19": "img/tracking-protection-16.png"
     },
     "default_title": "Blok",
-    "default_popup": "html/toolbar.html"
+    "default_popup": "html/popup.html"
   },
 
   "permissions": [
     "storage",
     "webRequest",
     "webRequestBlocking"
-  ],
-
-  "web_accessible_resources": [
-    "html/toolbar.html",
-    "html/feedback.html"
   ]
 
 }
