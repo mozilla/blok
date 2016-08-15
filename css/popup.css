@@ -3,7 +3,11 @@ body {
 }
 
 .row {
-  padding: 1em;
+  padding: .5em;
+}
+
+.panel-row {
+  padding: 0;
 }
 
 .button {
@@ -41,4 +45,10 @@ input:checked ~ .switch-paddle {
 
 .switch-paddle::after {
   border-radius: 15px;
+}
+
+.feedback-panel-back-arrow {
+  flex-direction: column;
+  background-color: #EBEBEB;
+  cursor: pointer;
 }

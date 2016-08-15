@@ -1,14 +1,14 @@
 var disabled = false
 
 function hideClass (className) {
-  for (let blockingElement of document.querySelectorAll('.' + className)) {
-    blockingElement.className = className + ' hide'
+  for (let element of document.querySelectorAll('.' + className)) {
+    element.className = className + ' hide'
   }
 }
 
 function showClass (className) {
-  for (let disabledElement of document.querySelectorAll('.' + className)) {
-    disabledElement.className = className
+  for (let element of document.querySelectorAll('.' + className)) {
+    element.className = className
   }
 }
 
@@ -42,13 +42,16 @@ document.querySelector('#toggle-blok').addEventListener('click', () => {
   window.close()
 })
 
+document.querySelector('.feedback-panel-back-arrow').addEventListener('click', () => {
+  document.querySelector('#main-panel').className = ''
+  document.querySelector('#feedback-panel').className = 'hide'
+})
+
 for (let feedbackBtn of document.querySelectorAll('.feedback-btn')) {
   feedbackBtn.addEventListener('click', function (event) {
     var feedback = event.target.dataset.feedback
     browser.runtime.sendMessage({'feedback': feedback})
-    for (let feedbackDiv of document.querySelectorAll('.feedback')) {
-      feedbackDiv.className = 'hide'
-    }
-    document.querySelector('#feedback-' + feedback).className = 'feedback'
+    document.querySelector('#main-panel').className = 'hide'
+    document.querySelector('#feedback-panel').className = ''
   })
 }

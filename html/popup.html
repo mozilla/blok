@@ -9,6 +9,7 @@
 
   <body>
 
+    <div id="main-panel">
     <div class="row">
       <div class="blocking">
         <h5>Blok is blocking tracker requests on this site.</h5>
@@ -19,7 +20,13 @@
     </div>
     <div class="row align-center">
       <div class="columns">
-        <div class="blocking columns">
+        <div id="feedback-page-problem" class="feedback hide">
+          You reported a problem on this page.
+        </div>
+        <div id="feedback-page-works" class="feedback hide">
+          You said this page works well.
+        </div>
+        <div class="blocking">
           <a class="feedback-btn secondary expanded button" data-feedback="page-works">This page works well</a>
           <a class="feedback-btn expanded button" data-feedback="page-problem">Report a problem</a>
         </div>
@@ -44,13 +51,44 @@
         </span>
       </div>
     </div>
-    <div id="feedback-page-problem" class="feedback hide">
-      You reported a problem on this page.
-      <a class="feedback-btn tiny button" data-feedback="page-works">This page works well</a>
     </div>
-    <div id="feedback-page-works" class="feedback hide">
-      You said this page works well.
-      <a class="feedback-btn tiny button" data-feedback="page-problem">Report a problem</a>
+
+    <div id="feedback-panel" class="hide">
+      <div class="row panel-row">
+        <div class="small-1 columns feedback-panel-back-arrow">
+          &lang;
+        </div>
+        <div class="small-11 columns feedback-panel-form">
+          <div class="row">
+            <h5>Thanks! We have noted you saw a problem with this page.</h5>
+          </div>
+          <div class="row">
+            <p>Please share any additional information about the problems you see.</p>
+            <fieldset>
+              <legend>I noticed a problem with: <span id="breakage-required" class="hide">This field is required</span></legend>
+              <input type="radio" name="breakage" value="images" id="broken-images">
+              <label for="broken-images">Images</label><br>
+              <input type="radio" name="breakage" value="video" id="broken-video">
+              <label for="broken-video">Video</label><br>
+              <input type="radio" name="breakage" value="layout" id="broken-layout">
+              <label for="broken-layout">Layout</label><br>
+              <input type="radio" name="breakage" value="buttons" id="broken-buttons">
+              <label for="broken-buttons">Buttons</label><br>
+              <input type="radio" name="breakage" value="other" id="broken-other">
+              <label for="broken-other">Something else</label><br>
+            </fieldset>
+          </div>
+          <div class="row">
+            <label>
+              Why do you think Blok caused this problem?
+              <textarea id="notes" rows="3"></textarea>
+            </label>
+          </div>
+          <div class="row">
+            <a class="feedback-btn expanded button">Submit</a>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="/js/popup.js"></script>
