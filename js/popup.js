@@ -1,5 +1,10 @@
 var disabled = false
 
+function showMainPanel () {
+  document.querySelector('#main-panel').className = ''
+  document.querySelector('#feedback-panel').className = 'hide'
+}
+
 function hideClass (className) {
   for (let element of document.querySelectorAll('.' + className)) {
     element.className = className + ' hide'
@@ -53,11 +58,6 @@ for (let feedbackBtn of document.querySelectorAll('.feedback-btn')) {
       window.close()
     }
   })
-}
-
-function showMainPanel () {
-  document.querySelector('#main-panel').className = ''
-  document.querySelector('#feedback-panel').className = 'hide'
 }
 
 document.querySelector('.feedback-panel-back-arrow').addEventListener('click', () => {
