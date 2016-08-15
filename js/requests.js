@@ -10,10 +10,10 @@ function getRequestEntity (entityList, originTopHost, requestTopHost, mainFrameO
   let requestEntityName = null
   let sameEntity = false
   for (let entityName in entityList) {
-    var entity = entityList[entityName]
-    var requestIsEntityResource = false
-    var originIsEntityProperty = false
-    var mainFrameOriginIsEntityProperty = false
+    let entity = entityList[entityName]
+    let requestIsEntityResource = false
+    let originIsEntityProperty = false
+    let mainFrameOriginIsEntityProperty = false
 
     requestIsEntityResource = hostInEntity(entity.resources, requestTopHost)
     if (requestIsEntityResource) {
