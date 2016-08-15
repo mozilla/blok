@@ -49,16 +49,11 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
     originTopHost = canonicalizeHost(new URL(requestDetails.originUrl).host)
     currentActiveOrigin = originTopHost
     currentOriginDisabledIndex = allowedHosts.indexOf(currentActiveOrigin)
-    console.log('currentActiveOrigin: ' + currentActiveOrigin)
     currentOriginDisabled = currentOriginDisabledIndex > -1
-    console.log('currentOriginDisabled: ' + currentOriginDisabled)
     if (requestDetails.frameId === 0) {
-      console.log('frameId === 0')
       mainFrameOriginTopHosts[requestTabID] = originTopHost
       if (currentOriginDisabled) {
-        console.log('setting topFrameHostDisabled true')
         window.topFrameHostDisabled = true
-        console.log('window.topFrameHostDisabled: ' + window.topFrameHostDisabled)
         browser.pageAction.setIcon({
           tabId: requestTabID,
           path: 'img/tracking-protection-disabled-16.png'

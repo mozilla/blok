@@ -42,16 +42,38 @@ document.querySelector('#toggle-blok').addEventListener('click', () => {
   window.close()
 })
 
-document.querySelector('.feedback-panel-back-arrow').addEventListener('click', () => {
-  document.querySelector('#main-panel').className = ''
-  document.querySelector('#feedback-panel').className = 'hide'
-})
-
 for (let feedbackBtn of document.querySelectorAll('.feedback-btn')) {
   feedbackBtn.addEventListener('click', function (event) {
     var feedback = event.target.dataset.feedback
     browser.runtime.sendMessage({'feedback': feedback})
-    document.querySelector('#main-panel').className = 'hide'
-    document.querySelector('#feedback-panel').className = ''
+    if (feedback === 'page-problem') {
+      document.querySelector('#main-panel').className = 'hide'
+      document.querySelector('#feedback-panel').className = ''
+    } else {
+      window.close()
+    }
   })
 }
+
+function showMainPanel () {
+  document.querySelector('#main-panel').className = ''
+  document.querySelector('#feedback-panel').className = 'hide'
+}
+
+document.querySelector('.feedback-panel-back-arrow').addEventListener('click', () => {
+  showMainPanel()
+})
+
+document.querySelector('#submit-btn').addEventListener('click', function () {
+  let breakageChecked = document.querySelector('input.breakage:checked')
+  if (breakageChecked !== null) {
+    let message = {
+      'breakage': breakageChecked.value,
+      'notes': document.querySelector('textarea#notes').textContent
+    }
+    browser.runtime.sendMessage(message)
+    window.close()
+  } else {
+    document.querySelector('#breakage-required').className = ''
+  }
+})

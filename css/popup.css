@@ -52,3 +52,7 @@ input:checked ~ .switch-paddle {
   background-color: #EBEBEB;
   cursor: pointer;
 }
+
+#breakage-required {
+  color: #ec5840;
+}

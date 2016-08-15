@@ -66,15 +66,15 @@
             <p>Please share any additional information about the problems you see.</p>
             <fieldset>
               <legend>I noticed a problem with: <span id="breakage-required" class="hide">This field is required</span></legend>
-              <input type="radio" name="breakage" value="images" id="broken-images">
+              <input class="breakage" type="radio" name="breakage" value="images" id="broken-images">
               <label for="broken-images">Images</label><br>
-              <input type="radio" name="breakage" value="video" id="broken-video">
+              <input class="breakage" type="radio" name="breakage" value="video" id="broken-video">
               <label for="broken-video">Video</label><br>
-              <input type="radio" name="breakage" value="layout" id="broken-layout">
+              <input class="breakage" type="radio" name="breakage" value="layout" id="broken-layout">
               <label for="broken-layout">Layout</label><br>
-              <input type="radio" name="breakage" value="buttons" id="broken-buttons">
+              <input class="breakage" type="radio" name="breakage" value="buttons" id="broken-buttons">
               <label for="broken-buttons">Buttons</label><br>
-              <input type="radio" name="breakage" value="other" id="broken-other">
+              <input class="breakage" type="radio" name="breakage" value="other" id="broken-other">
               <label for="broken-other">Something else</label><br>
             </fieldset>
           </div>
@@ -85,7 +85,7 @@
             </label>
           </div>
           <div class="row">
-            <a class="feedback-btn expanded button">Submit</a>
+            <a id="submit-btn" class="expanded button">Submit</a>
           </div>
         </div>
       </div>
