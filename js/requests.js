@@ -7,7 +7,7 @@ function requestAllower (tabID, totalExecTime, startDateTime) {
 }
 
 function getRequestEntity (entityList, originTopHost, requestTopHost, mainFrameOriginTopHost) {
-  var requestEntityName
+  let requestEntityName = null
   let sameEntity = false
   for (let entityName in entityList) {
     var entity = entityList[entityName]
@@ -27,8 +27,10 @@ function getRequestEntity (entityList, originTopHost, requestTopHost, mainFrameO
     if ((originIsEntityProperty || mainFrameOriginIsEntityProperty) && requestIsEntityResource) {
       log(`originTopHost ${originTopHost} and resource requestTopHost ${requestTopHost} belong to the same entity: ${entityName}; allowing request`)
       sameEntity = true
+      break
     }
   }
+  // TODO: https://github.com/mozilla/blok/issues/110
   return {'entityName': requestEntityName, 'sameEntity': sameEntity}
 }
 

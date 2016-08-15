@@ -42,3 +42,10 @@ test('getRequestEntity request to facebook.com from github.io iframe on facebook
   t.equal(requestEntity.entityName, 'Facebook')
   t.ok(requestEntity.sameEntity)
 })
+
+test('getRequestEntity request to ap.com from tulsaworld.com iframe returns null and false', (t) => {
+  t.plan(2)
+  let requestEntity = getRequestEntity(entityListFixtureData, 'tulsaworld.com', 'ap.com', 'tulsaworld.com')
+  t.equal(requestEntity.entityName, null)
+  t.notOk(requestEntity.sameEntity)
+})
