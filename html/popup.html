@@ -11,21 +11,38 @@
 
     <div class="row">
       <div class="blocking">
-        Blok is enabled. It is blocking tracker requests on this site.
+        <h5>Blok is blocking tracker requests on this site.</h5>
       </div>
       <div class="disabled hide">
-        Blok is disabled. Parts of this site may be tracking your activity.
+        <h5>Parts of this site may be tracking your activity.</h5>
       </div>
     </div>
-    <div class="row">
-      <div class="blocking">
-        <a class="feedback-btn tiny button" data-feedback="page-works">This page works well</a>
-        <a class="feedback-btn tiny button" data-feedback="page-problem">Report a problem</a>
+    <div class="row align-center">
+      <div class="columns">
+        <div class="blocking columns">
+          <a class="feedback-btn secondary expanded button" data-feedback="page-works">This page works well</a>
+          <a class="feedback-btn expanded button" data-feedback="page-problem">Report a problem</a>
+        </div>
       </div>
     </div>
-    <div class="row">
-      <a id="disable-link" class="blocking">Disable Blok for this website.</a>
-      <a id="re-enable-link" class="disabled">Enable Blok for this website.</a>
+    <hr/>
+    <div class="row align-middle">
+      <div class="small-8 columns">
+        <span class="blocking">
+          Blok is enabled for this site.
+        </span>
+        <span class="disabled">
+          Blok is disabled for this site.
+        </span>
+      </div>
+      <div class="small-4 columns">
+        <span class="switch">
+          <input class="switch-input" id="enabledSwitch" type="checkbox" name="enabledSwitch" autocomplete="off">
+          <label id="toggle-blok" class="switch-paddle" for="enabledSwitch">
+            <span class="show-for-sr">Toggle Blok</span>
+          </label>
+        </span>
+      </div>
     </div>
     <div id="feedback-page-problem" class="feedback hide">
       You reported a problem on this page.

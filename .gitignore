@@ -1,6 +1,5 @@
 node_modules
 *.bundle.js
 web-ext-artifacts/*.zip
-css/foundation.min.css
 .nyc_output
 .DS_Store

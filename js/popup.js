@@ -1,3 +1,5 @@
+var disabled = false
+
 function hideClass (className) {
   for (let blockingElement of document.querySelectorAll('.' + className)) {
     blockingElement.className = className + ' hide'
@@ -13,30 +15,31 @@ function showClass (className) {
 function setDisabledUI () {
   hideClass('blocking')
   showClass('disabled')
+  document.querySelector('#enabledSwitch').removeAttribute('checked')
 }
 
 function setEnabledUI () {
   hideClass('disabled')
   showClass('blocking')
+  document.querySelector('#enabledSwitch').setAttribute('checked', true)
 }
 
 browser.runtime.getBackgroundPage((bgPage) => {
-  console.log('toolbar.js, bgPage.topFrameHostDisabled: ' + bgPage.topFrameHostDisabled)
-  if (bgPage.topFrameHostDisabled) {
+  disabled = bgPage.topFrameHostDisabled
+  if (disabled) {
     setDisabledUI()
   } else {
     setEnabledUI()
   }
 })
 
-document.querySelector('#disable-link').addEventListener('click', function () {
-  setDisabledUI()
-  browser.runtime.sendMessage('disable')
-})
-
-document.querySelector('#re-enable-link').addEventListener('click', function () {
-  setEnabledUI()
-  browser.runtime.sendMessage('re-enable')
+document.querySelector('#toggle-blok').addEventListener('click', () => {
+  if (disabled) {
+    browser.runtime.sendMessage('re-enable')
+  } else {
+    browser.runtime.sendMessage('disable')
+  }
+  window.close()
 })
 
 for (let feedbackBtn of document.querySelectorAll('.feedback-btn')) {
