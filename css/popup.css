@@ -1,5 +1,5 @@
 body {
-  width: 380px;
+  width: 400px;
 }
 
 .row {
@@ -29,9 +29,8 @@ body {
   color: #1F1F1F;
 }
 
-.toggle {
-  display: flex;
-  align-items: center;
+.toggle-column {
+  text-align: right;
 }
 
 input ~ .switch-paddle {
@@ -55,4 +54,8 @@ input:checked ~ .switch-paddle {
 
 #breakage-required {
   color: #ec5840;
+}
+
+.notes-label {
+  width: 100%;
 }
