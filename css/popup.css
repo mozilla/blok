@@ -2,8 +2,16 @@ body {
   width: 400px;
 }
 
+hr {
+  margin: auto;
+}
+
 .row {
   padding: .5em;
+}
+
+.title {
+  font-size: 18px;
 }
 
 .panel-row {
@@ -29,6 +37,10 @@ body {
   color: #1F1F1F;
 }
 
+.toggle-label-column {
+  font-size: 13px;
+}
+
 .toggle-column {
   text-align: right;
 }
@@ -36,6 +48,7 @@ body {
 input ~ .switch-paddle {
   border-radius: 15px;
   background: #999999;
+  vertical-align: middle;
 }
 
 input:checked ~ .switch-paddle {

@@ -1,31 +1,31 @@
 var disabled = false
 
+function show (querySelector) {
+  for (let element of document.querySelectorAll(querySelector)) {
+    element.classList.remove('hide')
+  }
+}
+
+function hide (querySelector) {
+  for (let element of document.querySelectorAll(querySelector)) {
+    element.classList.add('hide')
+  }
+}
+
 function showMainPanel () {
-  document.querySelector('#main-panel').className = ''
-  document.querySelector('#feedback-panel').className = 'hide'
-}
-
-function hideClass (className) {
-  for (let element of document.querySelectorAll('.' + className)) {
-    element.className = className + ' hide'
-  }
-}
-
-function showClass (className) {
-  for (let element of document.querySelectorAll('.' + className)) {
-    element.className = className
-  }
+  show('#main-panel')
+  hide('#feedback-panel')
 }
 
 function setDisabledUI () {
-  hideClass('blocking')
-  showClass('disabled')
+  hide('.blocking')
+  show('.disabled')
   document.querySelector('#enabledSwitch').removeAttribute('checked')
 }
 
 function setEnabledUI () {
-  hideClass('disabled')
-  showClass('blocking')
+  hide('.disabled')
+  show('.blocking')
   document.querySelector('#enabledSwitch').setAttribute('checked', true)
 }
 
