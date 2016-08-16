@@ -1,4 +1,6 @@
-var disabled = false
+let disabled = false
+let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 function show (querySelector) {
   for (let element of document.querySelectorAll(querySelector)) {
@@ -15,6 +17,19 @@ function hide (querySelector) {
 function showMainPanel () {
   show('#main-panel')
   hide('#feedback-panel')
+}
+
+function showFeedbackPanel () {
+  hide('#main-panel')
+  show('#feedback-panel')
+}
+
+function showHostReport (hostReport) {
+  let date = new Date(hostReport.dateTime)
+  let hostReportDateTimeString = days[date.getDay()] + ', ' + months[date.getMonth()] + ' ' + date.getDate()
+  document.querySelector('.host-report-date').innerText = ' on ' + hostReportDateTimeString
+  show('.' + hostReport.feedback + '-host-report')
+  show('.host-report-row')
 }
 
 function setDisabledUI () {
@@ -36,6 +51,10 @@ browser.runtime.getBackgroundPage((bgPage) => {
   } else {
     setEnabledUI()
   }
+  let hostReport = bgPage.topFrameHostReport
+  if (hostReport.hasOwnProperty('feedback')) {
+    showHostReport(hostReport)
+  }
 })
 
 document.querySelector('#toggle-blok').addEventListener('click', () => {
@@ -52,8 +71,7 @@ for (let feedbackBtn of document.querySelectorAll('.feedback-btn')) {
     var feedback = event.target.dataset.feedback
     browser.runtime.sendMessage({'feedback': feedback})
     if (feedback === 'page-problem') {
-      document.querySelector('#main-panel').className = 'hide'
-      document.querySelector('#feedback-panel').className = ''
+      showFeedbackPanel()
     } else {
       window.close()
     }

@@ -6,6 +6,7 @@ const {log} = require('./log')
 var currentActiveTabID
 var currentOriginDisabledIndex = -1
 window.topFrameHostDisabled = false
+window.topFrameHostReport = {}
 var currentActiveOrigin
 var blockedRequests = {}
 var blockedEntities = {}
@@ -23,7 +24,7 @@ function restartBlokForTab (tabID) {
   mainFrameOriginTopHosts[tabID] = null
 }
 
-function blockTrackerRequests (blocklist, allowedHosts, entityList) {
+function blockTrackerRequests (blocklist, allowedHosts, entityList, reportedHosts) {
   return function filterRequest (requestDetails) {
     var blockTrackerRequestsStart = Date.now()
     var requestTabID = requestDetails.tabId
@@ -60,6 +61,11 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
         })
       } else {
         window.topFrameHostDisabled = false
+      }
+      if (reportedHosts.hasOwnProperty(originTopHost)) {
+        window.topFrameHostReport = reportedHosts[originTopHost]
+      } else {
+        window.topFrameHostReport = {}
       }
     }
 
@@ -141,9 +147,9 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
   }
 }
 
-function startListeners ({blocklist, allowedHosts, entityList}, testPilotPingChannel) {
+function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, testPilotPingChannel) {
   browser.webRequest.onBeforeRequest.addListener(
-    blockTrackerRequests(blocklist, allowedHosts, entityList),
+    blockTrackerRequests(blocklist, allowedHosts, entityList, reportedHosts),
     {urls: ['*://*/*']},
     ['blocking']
   )
@@ -203,6 +209,11 @@ function startListeners ({blocklist, allowedHosts, entityList}, testPilotPingCha
         'feedback': message.feedback,
         'origin': mainFrameOriginTopHosts[currentActiveTabID]
       })
+      reportedHosts[mainFrameOriginTopHosts[currentActiveTabID]] = {
+        'feedback': message.feedback,
+        'dateTime': Date.now()
+      }
+      browser.storage.local.set({reportedHosts: reportedHosts})
     }
     if (message.hasOwnProperty('breakage')) {
       let testPilotPingMessage = {
@@ -221,6 +232,7 @@ function startListeners ({blocklist, allowedHosts, entityList}, testPilotPingCha
 const state = {
   blocklist: new Map(),
   allowedHosts: [],
+  reportedHosts: {},
   entityList: {}
 }
 

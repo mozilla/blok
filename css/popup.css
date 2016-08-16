@@ -1,5 +1,5 @@
 body {
-  width: 400px;
+  width: 360px;
 }
 
 hr {
@@ -11,7 +11,7 @@ hr {
 }
 
 .title {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .panel-row {
