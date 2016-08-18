@@ -51,11 +51,11 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList, reportedHost
     // Determine all origin flags
     originTopHost = canonicalizeHost(new URL(requestDetails.originUrl).host)
     currentActiveOrigin = originTopHost
-    flags.currentOriginDisabledIndex = allowedHosts.indexOf(currentActiveOrigin)
+    currentOriginDisabledIndex = allowedHosts.indexOf(currentActiveOrigin)
     flags.currentOriginDisabled = currentOriginDisabledIndex > -1
     if (requestDetails.frameId === 0) {
       mainFrameOriginTopHosts[requestTabID] = originTopHost
-      if (currentOriginDisabled) {
+      if (flags.currentOriginDisabled) {
         window.topFrameHostDisabled = true
         browser.pageAction.setIcon({
           tabId: requestTabID,
