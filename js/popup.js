@@ -87,7 +87,7 @@ document.querySelector('#submit-btn').addEventListener('click', function () {
   if (breakageChecked !== null) {
     let message = {
       'breakage': breakageChecked.value,
-      'notes': document.querySelector('textarea#notes').textContent
+      'notes': document.querySelector('textarea#notes').value
     }
     browser.runtime.sendMessage(message)
     window.close()
