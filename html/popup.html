@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/css/foundation.min.css">
+    <link rel="stylesheet" href="/css/popup.css">
+  </head>
+
+  <body>
+
+    <div id="main-panel">
+    <div class="row">
+      <div class="columns">
+        <div class="blocking title">Blok is blocking tracker requests on this site.</div>
+        <div class="disabled title hide">Parts of this site may be tracking your activity.</div>
+      </div>
+    </div>
+    <div class="row host-report-row hide">
+      <div class="columns page-problem-host-report hide">
+        You reported a problem on this page<span class="host-report-date"></span>.
+      </div>
+      <div class="columns page-works-host-report hide">
+        You said this page works well<span class="host-report-date"></span>.
+      </div>
+    </div>
+    <div class="row align-center">
+      <div class="columns">
+        <div class="blocking">
+          <a class="feedback-btn secondary expanded button" data-feedback="page-works">This page works well</a>
+          <a class="feedback-btn expanded button" data-feedback="page-problem">Report a problem</a>
+        </div>
+      </div>
+    </div>
+    <hr/>
+    <div class="row align-middle">
+      <div class="small-8 columns toggle-label-column">
+        <span class="blocking">Blok is enabled for this site.</span>
+        <span class="disabled">Blok is disabled for this site.</span>
+      </div>
+      <div class="small-4 columns toggle-column">
+        <span class="switch">
+          <input class="switch-input" id="enabledSwitch" type="checkbox" name="enabledSwitch" autocomplete="off">
+          <label id="toggle-blok" class="switch-paddle" for="enabledSwitch">
+            <span class="show-for-sr">Toggle Blok</span>
+          </label>
+        </span>
+      </div>
+    </div>
+    </div>
+
+    <div id="feedback-panel" class="hide">
+      <div class="row panel-row">
+        <div class="small-1 columns feedback-panel-back-arrow">
+          &lang;
+        </div>
+        <div class="small-11 columns feedback-panel-form">
+          <div class="row">
+            <h5>Thanks! We have noted you saw a problem with this page.</h5>
+          </div>
+          <div class="row">
+            <p>Please share any additional information about the problems you see.</p>
+            <fieldset>
+              <legend>I noticed a problem with: <span id="breakage-required" class="hide">This field is required</span></legend>
+              <input class="breakage" type="radio" name="breakage" value="images" id="broken-images">
+              <label for="broken-images">Images</label><br>
+              <input class="breakage" type="radio" name="breakage" value="video" id="broken-video">
+              <label for="broken-video">Video</label><br>
+              <input class="breakage" type="radio" name="breakage" value="layout" id="broken-layout">
+              <label for="broken-layout">Layout</label><br>
+              <input class="breakage" type="radio" name="breakage" value="buttons" id="broken-buttons">
+              <label for="broken-buttons">Buttons</label><br>
+              <input class="breakage" type="radio" name="breakage" value="other" id="broken-other">
+              <label for="broken-other">Something else</label><br>
+            </fieldset>
+          </div>
+          <div class="row">
+            <label class="notes-label">
+              Why do you think Blok caused this problem?
+              <textarea id="notes" rows="3"></textarea>
+            </label>
+          </div>
+          <div class="row">
+            <a id="submit-btn" class="expanded button">Submit</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/popup.js"></script>
+
+  </body>
+
+</html>

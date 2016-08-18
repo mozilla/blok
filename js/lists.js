@@ -21,7 +21,11 @@ function loadLists (state) {
     state.allowedHosts = allowedHosts
   })
 
-  return Promise.all([blockListPromise, entityListPromise, allowedHostsPromise])
+  const reportedHostsPromise = getReportedHostsList().then((reportedHosts) => {
+    state.reportedHosts = reportedHosts
+  })
+
+  return Promise.all([blockListPromise, entityListPromise, allowedHostsPromise, reportedHostsPromise])
 }
 
 function loadJSON (url) {
@@ -76,6 +80,15 @@ function getAllowedHostsList () {
       return item.allowedHosts
     }
     return []
+  })
+}
+
+function getReportedHostsList () {
+  return browser.storage.local.get('reportedHosts').then((item) => {
+    if (item.reportedHosts) {
+      return item.reportedHosts
+    }
+    return {}
   })
 }
 

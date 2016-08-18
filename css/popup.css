@@ -1,0 +1,74 @@
+body {
+  width: 360px;
+}
+
+hr {
+  margin: auto;
+}
+
+.row {
+  padding: .5em;
+}
+
+.title {
+  font-size: 16px;
+}
+
+.panel-row {
+  padding: 0;
+}
+
+.button {
+  border-radius: 5px;
+  background-color: #2EA3FF;
+}
+
+.button:focus, .button:hover {
+  background-color: #0c81dd;
+}
+
+.button.secondary {
+  background-color: #F2F2F2;
+  color: #1F1F1F;
+}
+
+.button.secondary:focus, .button.secondary:hover {
+  background-color: #dbdbdb;
+  color: #1F1F1F;
+}
+
+.toggle-label-column {
+  font-size: 13px;
+}
+
+.toggle-column {
+  text-align: right;
+}
+
+input ~ .switch-paddle {
+  border-radius: 15px;
+  background: #999999;
+  vertical-align: middle;
+}
+
+input:checked ~ .switch-paddle {
+  background: #4BD463;
+}
+
+.switch-paddle::after {
+  border-radius: 15px;
+}
+
+.feedback-panel-back-arrow {
+  flex-direction: column;
+  background-color: #EBEBEB;
+  cursor: pointer;
+}
+
+#breakage-required {
+  color: #ec5840;
+}
+
+.notes-label {
+  width: 100%;
+}

@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Blok",
-  "version": "0.1.11",
+  "version": "0.1.12",
 
   "description": "Implements tracking protection as a web extension add-on.",
   "icons": {
@@ -11,7 +11,7 @@
   "applications": {
     "gecko": {
       "id": "blok@mozilla.org",
-      "strict_min_version": "45.0"
+      "strict_min_version": "48.0"
     }
   },
 
@@ -19,26 +19,20 @@
     "scripts": ["js/background.bundle.js"]
   },
 
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["/js/contentscript.js"],
-      "css": ["/css/contentscript.css"],
-      "run_at": "document_start"
-    }
-  ],
-
   "homepage_url": "https://testpilot.firefox.com/",
+
+  "page_action": {
+    "default_icon": {
+      "19": "img/tracking-protection-16.png"
+    },
+    "default_title": "Blok",
+    "default_popup": "html/popup.html"
+  },
 
   "permissions": [
     "storage",
     "webRequest",
     "webRequestBlocking"
-  ],
-
-  "web_accessible_resources": [
-    "html/toolbar.html",
-    "html/feedback.html"
   ]
 
 }
