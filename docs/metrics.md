@@ -13,17 +13,19 @@ interacting with it.
 
 ![](images/kpi-1.png)
 
-### Additional interesting questions
+### Immediate Questions
 
-* What are the most popular broken sites?
-  * How are they broken?
-    * How might we fix them?
-  * Is there an anti-blocker in the page?
+* On what sites are users reporting the most breakage?
+  * How are those sites broken?
 * Which trackers are most commonly involved with breakage?
-  * What tracking techniques are they using?
+
+### Follow-up Questions
+
+* How might we fix sites that are reported as broken?
+* Is there an anti-blocker on broken sites?
+* What tracking techniques are the most common trackers using?
 * How much time & bandwidth are users wasting with trackers?
 * How often are users prompted about blocking and don't reply?
-
 
 ## Data Collection
 
@@ -35,9 +37,33 @@ Blok will use Test Pilot's Telemetry wrapper with no batching of data.  Details
 of when pings are sent are below, along with examples of the `payload` portion
 of a `testpilottest` telemetry ping for each scenario.
 
-* The user clicks "This page works well" button in the notification bar
+* The user clicks "Disable Blok for this site" button in the popup
 
-In this case `breakage` and `notes` are empty.
+```js
+  {
+    "originDomain": "www.redditmedia.com",
+    "trackerDomains": ["ssl.google-analytics.com",
+                       "z.moatads.com"],
+    "breakage": "",
+    "notes": "",
+    "event": "blok-disabled"
+  }
+```
+
+* The user clicks "Enable Blok for this site" button in the popup
+
+```js
+  {
+    "originDomain": "www.redditmedia.com",
+    "trackerDomains": ["ssl.google-analytics.com",
+                       "z.moatads.com"],
+    "breakage": "",
+    "notes": "",
+    "event": "blok-enabled"
+  }
+```
+
+* The user clicks "This page works well" button in the popup
 
 ```js
   {
@@ -50,9 +76,7 @@ In this case `breakage` and `notes` are empty.
   }
 ```
 
-* The user clicks "Report a problem" button in the notification bar
-
-In this case `breakage` and `notes` are also always empty.
+* The user clicks "Report a problem" button in the popup
 
 ```js
   {
