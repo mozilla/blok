@@ -165,6 +165,15 @@ function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, t
 
   browser.runtime.onMessage.addListener(function (message) {
     if (message === 'disable') {
+      let testPilotPingMessage = {
+        originDomain: currentActiveOrigin,
+        trackerDomains: blockedRequests[currentActiveTabID],
+        event: 'blok-disabled',
+        breakage: '',
+        notes: ''
+      }
+      log('telemetry ping payload: ' + JSON.stringify(testPilotPingMessage))
+      testPilotPingChannel.postMessage(testPilotPingMessage)
       browser.pageAction.setIcon({
         tabId: currentActiveTabID,
         path: 'img/tracking-protection-disabled-16.png'
@@ -174,6 +183,15 @@ function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, t
       browser.tabs.reload(currentActiveTabID)
     }
     if (message === 're-enable') {
+      let testPilotPingMessage = {
+        originDomain: currentActiveOrigin,
+        trackerDomains: blockedRequests[currentActiveTabID],
+        event: 'blok-enabled',
+        breakage: '',
+        notes: ''
+      }
+      log('telemetry ping payload: ' + JSON.stringify(testPilotPingMessage))
+      testPilotPingChannel.postMessage(testPilotPingMessage)
       browser.pageAction.setIcon({
         tabId: currentActiveTabID,
         path: 'img/tracking-protection-16.png'
@@ -186,11 +204,12 @@ function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, t
       let testPilotPingMessage = {
         originDomain: currentActiveOrigin,
         trackerDomains: blockedRequests[currentActiveTabID],
-        feedback: message.feedback
+        event: message.feedback,
+        breakage: '',
+        notes: ''
       }
       log('telemetry ping payload: ' + JSON.stringify(testPilotPingMessage))
       testPilotPingChannel.postMessage(testPilotPingMessage)
-      log('mainFrameOriginTopHosts[currentActiveTabID]: ' + mainFrameOriginTopHosts[currentActiveTabID])
       browser.tabs.sendMessage(currentActiveTabID, {
         'feedback': message.feedback,
         'origin': mainFrameOriginTopHosts[currentActiveTabID]
@@ -205,6 +224,7 @@ function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, t
       let testPilotPingMessage = {
         originDomain: currentActiveOrigin,
         trackerDomains: blockedRequests[currentActiveTabID],
+        event: 'submit',
         breakage: message.breakage,
         notes: message.notes
       }
