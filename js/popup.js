@@ -1,8 +1,29 @@
-var React = require('react')
+const {DOM, createClass, createElement} = require('react')
+const {div} = DOM
+const ReactDOM = require('react-dom')
 
 let disabled = false
 let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+const title = createClass({
+  displayName: "Title",
+
+  render: () => {
+    return(
+      div({ className: 'columns' },
+        div({ className: 'title' },
+          "Blok is blocking tracker requests on this site."
+        )
+      )
+    )
+  }
+});
+
+ReactDOM.render(
+  createElement(title, null),
+  document.getElementById('title-row')
+);
 
 function show (querySelector) {
   for (let element of document.querySelectorAll(querySelector)) {
