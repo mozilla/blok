@@ -9,21 +9,48 @@ let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'A
 const title = createClass({
   displayName: "Title",
 
-  render: () => {
+  render: function() {
+    let {disabled} = this.props
+    let titleText = 'Blok is blocking tracker requests on this site.'
+    if (disabled) {
+      titleText = 'Parts of this site may be tracking your activity.'
+    }
+
     return(
       div({ className: 'columns' },
         div({ className: 'title' },
-          "Blok is blocking tracker requests on this site."
+          titleText
         )
       )
     )
   }
-});
+})
 
-ReactDOM.render(
-  createElement(title, null),
-  document.getElementById('title-row')
-);
+const hostReport = createClass({
+  displayName: "Host Report",
+
+  render: function() {
+    const {hostReport} = this.props
+    const date = new Date(hostReport.dateTime)
+    const hostReportDateTimeString = days[date.getDay()] + ', ' + months[date.getMonth()] + ' ' + date.getDate()
+
+    let reportText = ''
+    if (hostReport.feedback == 'page-problem') {
+      reportText = 'You reported a problem on this page on '
+    } else if (hostReport.feedback == 'page-works') {
+      reportText = 'You said this page works well on '
+    } else {
+      return false
+    }
+    reportText += hostReportDateTimeString + '.'
+
+    return(
+      div({ className: 'columns' },
+        reportText
+      )
+    )
+  }
+})
 
 function show (querySelector) {
   for (let element of document.querySelectorAll(querySelector)) {
@@ -69,14 +96,17 @@ function setEnabledUI () {
 
 browser.runtime.getBackgroundPage((bgPage) => {
   disabled = bgPage.topFrameHostDisabled
-  if (disabled) {
-    setDisabledUI()
-  } else {
-    setEnabledUI()
-  }
-  let hostReport = bgPage.topFrameHostReport
-  if (hostReport.hasOwnProperty('feedback')) {
-    showHostReport(hostReport)
+  ReactDOM.render(
+    createElement(title, {disabled: disabled}),
+    document.getElementById('title-row')
+  )
+
+  let pageHostReport = bgPage.topFrameHostReport
+  if (pageHostReport.hasOwnProperty('feedback')) {
+    ReactDOM.render(
+      createElement(hostReport, {hostReport: pageHostReport}),
+      document.getElementById('host-report-row')
+    )
   }
 })
 
