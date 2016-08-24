@@ -1,12 +1,12 @@
-const {DOM, createClass, createElement} = require('react')
-const {div} = DOM
+const {DOM, createFactory, createClass, createElement} = require('react')
+const {div, a, span, input, label, hr} = DOM
 const ReactDOM = require('react-dom')
 
 let disabled = false
 let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
-const title = createClass({
+const Title = createFactory(createClass({
   displayName: "Title",
 
   render: function() {
@@ -24,9 +24,9 @@ const title = createClass({
       )
     )
   }
-})
+}))
 
-const hostReport = createClass({
+const HostReport = createFactory(createClass({
   displayName: "Host Report",
 
   render: function() {
@@ -50,7 +50,100 @@ const hostReport = createClass({
       )
     )
   }
+}))
+
+const Feedback = createFactory(createClass({
+  render: function() {
+    return(
+      div({ className: 'columns'},
+        a(
+          {
+            className: 'feedback-btn secondary expanded button',
+            'data-feedback': 'page-works'
+          },
+          'This page works well'
+        ),
+        a(
+          {
+            className: 'feedback-btn expanded button',
+            'data-feedback': 'page-problem'
+          },
+          'Report a problem'
+        )
+      )
+    )
+  }
+}))
+
+const Toggle = createFactory(createClass({
+  componentDidUpdate: function() {
+    if (this.props.disabled) {
+      this._input.removeAttribute('checked')
+    } else {
+      this._input.setAttribute('checked', true)
+    }
+  },
+
+  render: function() {
+    let {disabled, sendToggleMessage} = this.props
+    let currentStatus = disabled ? 'disabled' : 'enabled'
+    let labelText = 'Blok is ' + currentStatus + ' for this site.'
+
+    return div(
+      {className: 'row align-middle'},
+      div(
+        {className: 'small-8 columns toggle-label-column'},
+        labelText
+      ),
+      div(
+        {className: 'small-4 columns toggle-column'},
+        span(
+          { className: 'switch' },
+          input({
+            className: 'switch-input',
+            id: 'enabledSwitch',
+            type: 'checkbox',
+            name: 'enabledSwitch',
+            autoComplete: 'off',
+            checked: disabled ? null : true
+          }),
+          label(
+            {
+              className: 'switch-paddle',
+              id: 'toggle-blok',
+              htmlFor: 'enabledSwitch',
+              onClick: sendToggleMessage
+            },
+            span(
+              { className: 'show-for-sr' },
+              'Toggle Blok'
+            )
+          )
+        )
+      )
+    )
+  }
+}))
+
+const MainPanel = createClass({
+  render: function() {
+    let {disabled, hostReport} = this.props
+
+    let title = div({className: 'row'},
+      Title({ disabled: disabled })
+    )
+    let report = div({className: 'row'},
+      HostReport({ hostReport: hostReport })
+    )
+    let feedback = disabled ? null : div({ className: 'row align-center' }, Feedback())
+    let toggle = Toggle({ disabled: disabled, sendToggleMessage: sendToggleMessage })
+    return div(
+      {id: 'main-panel'},
+      title, report, feedback, hr(), toggle
+    )
+  }
 })
+
 
 function show (querySelector) {
   for (let element of document.querySelectorAll(querySelector)) {
@@ -94,29 +187,29 @@ function setEnabledUI () {
   document.querySelector('#enabledSwitch').setAttribute('checked', true)
 }
 
-browser.runtime.getBackgroundPage((bgPage) => {
-  disabled = bgPage.topFrameHostDisabled
-  ReactDOM.render(
-    createElement(title, {disabled: disabled}),
-    document.getElementById('title-row')
-  )
-
-  let pageHostReport = bgPage.topFrameHostReport
-  if (pageHostReport.hasOwnProperty('feedback')) {
-    ReactDOM.render(
-      createElement(hostReport, {hostReport: pageHostReport}),
-      document.getElementById('host-report-row')
-    )
-  }
-})
-
-document.querySelector('#toggle-blok').addEventListener('click', () => {
+function sendToggleMessage() {
   if (disabled) {
     browser.runtime.sendMessage('re-enable')
   } else {
     browser.runtime.sendMessage('disable')
   }
   window.close()
+}
+
+browser.runtime.getBackgroundPage((bgPage) => {
+  disabled = bgPage.topFrameHostDisabled
+  let pageHostReport = bgPage.topFrameHostReport
+
+  ReactDOM.render(
+    createElement(MainPanel,
+      {
+        disabled: disabled,
+        hostReport: pageHostReport,
+        sendToggleMessage: sendToggleMessage
+      }
+    ),
+    document.getElementById('popup')
+  )
 })
 
 for (let feedbackBtn of document.querySelectorAll('.feedback-btn')) {
