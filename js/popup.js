@@ -1,5 +1,5 @@
 const {DOM, createFactory, createClass, createElement} = require('react')
-const {div, a, span, input, label, hr, p, fieldset, legend} = DOM
+const {div, a, span, input, label, hr, h5, p, fieldset, legend, textarea} = DOM
 const ReactDOM = require('react-dom')
 
 let disabled = false
@@ -158,6 +158,21 @@ const MainPanel = createFactory(createClass({
   }
 }))
 
+const FeedbackBreakage = createFactory(createClass({
+  render: function () {
+    let breakage = this.props.breakage
+    return div({},
+      input(
+        {className: 'breakage', type: 'radio', name: 'breakage', value: breakage, id: breakage}
+      ),
+      label(
+        {htmlFor: breakage},
+        breakage
+      )
+    )
+  }
+}))
+
 const FeedbackPanel = createClass({
   render: function () {
     return div(
@@ -165,14 +180,20 @@ const FeedbackPanel = createClass({
       div(
         {className: 'row panel-row'},
         div(
-          {className: 'small-1 columns feedback-panel-back-arrow'},
+          {
+            className: 'small-1 columns feedback-panel-back-arrow',
+            onClick: this.props.showMainPanel
+          },
           '\u2329'
         ),
         div(
           {className: 'small-11 columns feedback-panel-form'},
           div(
             {className: 'row'},
-            'Thanks! We have noted you saw a problem with this page.'
+            h5(
+              {},
+              'Thanks! We have noted you saw a problem with this page.'
+            )
           ),
           div(
             {className: 'row'},
@@ -185,7 +206,33 @@ const FeedbackPanel = createClass({
               legend(
                 {},
                 'I noticed a problem with:'
+              ),
+              FeedbackBreakage({ breakage: 'images' }),
+              FeedbackBreakage({ breakage: 'video' }),
+              FeedbackBreakage({ breakage: 'layout' }),
+              FeedbackBreakage({ breakage: 'buttons' }),
+              FeedbackBreakage({ breakage: 'other' })
+            )
+          ),
+          div(
+            {className: 'row'},
+            label(
+              {className: 'notes-label'},
+              'Why do you think Blok caused this problem?',
+              textarea(
+                {id: 'notes', rows: 3}
               )
+            )
+          ),
+          div(
+            {className: 'row'},
+            a(
+              {
+                id: 'submit-btn',
+                className: 'expanded button',
+                onClick: this.props.sendBreakageMessage
+              },
+              'Submit'
             )
           )
         )
@@ -203,13 +250,22 @@ const Popup = createClass({
     this.setState({ showFeedbackPanel: true })
   },
 
+  showMainPanel: function () {
+    this.setState({ showFeedbackPanel: false })
+  },
+
   render: function () {
     let {disabled, hostReport, sendToggleMessage} = this.props
     let mainPanel = null
     let feedbackPanel = null
 
     if (this.state.showFeedbackPanel) {
-      feedbackPanel = createElement(FeedbackPanel, {})
+      feedbackPanel = createElement(FeedbackPanel,
+        {
+          showMainPanel: this.showMainPanel,
+          sendBreakageMessage: this.props.sendBreakageMessage
+        }
+      )
     } else {
       mainPanel = createElement(MainPanel,
         {
@@ -225,23 +281,6 @@ const Popup = createClass({
   }
 })
 
-function show (querySelector) {
-  for (let element of document.querySelectorAll(querySelector)) {
-    element.classList.remove('hide')
-  }
-}
-
-function hide (querySelector) {
-  for (let element of document.querySelectorAll(querySelector)) {
-    element.classList.add('hide')
-  }
-}
-
-function showMainPanel () {
-  show('#main-panel')
-  hide('#feedback-panel')
-}
-
 function sendToggleMessage () {
   if (disabled) {
     browser.runtime.sendMessage('re-enable')
@@ -251,27 +290,7 @@ function sendToggleMessage () {
   window.close()
 }
 
-browser.runtime.getBackgroundPage((bgPage) => {
-  disabled = bgPage.topFrameHostDisabled
-  let pageHostReport = bgPage.topFrameHostReport
-
-  ReactDOM.render(
-    createElement(Popup,
-      {
-        disabled: disabled,
-        hostReport: pageHostReport,
-        sendToggleMessage: sendToggleMessage
-      }
-    ),
-    document.getElementById('popup')
-  )
-})
-
-document.querySelector('.feedback-panel-back-arrow').addEventListener('click', () => {
-  showMainPanel()
-})
-
-document.querySelector('#submit-btn').addEventListener('click', function () {
+function sendBreakageMessage () {
   let breakageChecked = document.querySelector('input.breakage:checked')
   if (breakageChecked !== null) {
     let message = {
@@ -283,4 +302,21 @@ document.querySelector('#submit-btn').addEventListener('click', function () {
   } else {
     document.querySelector('#breakage-required').className = ''
   }
+}
+
+browser.runtime.getBackgroundPage((bgPage) => {
+  disabled = bgPage.topFrameHostDisabled
+  let pageHostReport = bgPage.topFrameHostReport
+
+  ReactDOM.render(
+    createElement(Popup,
+      {
+        disabled: disabled,
+        hostReport: pageHostReport,
+        sendToggleMessage: sendToggleMessage,
+        sendBreakageMessage: sendBreakageMessage
+      }
+    ),
+    document.getElementById('popup')
+  )
 })
