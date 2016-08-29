@@ -1,5 +1,5 @@
 const {DOM, createFactory, createClass, createElement} = require('react')
-const {div, a, span, input, label, hr} = DOM
+const {div, a, span, input, label, hr, p, fieldset, legend} = DOM
 const ReactDOM = require('react-dom')
 
 let disabled = false
@@ -7,16 +7,16 @@ let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'S
 let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 const Title = createFactory(createClass({
-  displayName: "Title",
+  displayName: 'Title',
 
-  render: function() {
+  render: function () {
     let {disabled} = this.props
     let titleText = 'Blok is blocking tracker requests on this site.'
     if (disabled) {
       titleText = 'Parts of this site may be tracking your activity.'
     }
 
-    return(
+    return (
       div({ className: 'columns' },
         div({ className: 'title' },
           titleText
@@ -27,24 +27,24 @@ const Title = createFactory(createClass({
 }))
 
 const HostReport = createFactory(createClass({
-  displayName: "Host Report",
+  displayName: 'Host Report',
 
-  render: function() {
+  render: function () {
     const {hostReport} = this.props
     const date = new Date(hostReport.dateTime)
     const hostReportDateTimeString = days[date.getDay()] + ', ' + months[date.getMonth()] + ' ' + date.getDate()
 
     let reportText = ''
-    if (hostReport.feedback == 'page-problem') {
+    if (hostReport.feedback === 'page-problem') {
       reportText = 'You reported a problem on this page on '
-    } else if (hostReport.feedback == 'page-works') {
+    } else if (hostReport.feedback === 'page-works') {
       reportText = 'You said this page works well on '
     } else {
       return false
     }
     reportText += hostReportDateTimeString + '.'
 
-    return(
+    return (
       div({ className: 'columns' },
         reportText
       )
@@ -53,12 +53,23 @@ const HostReport = createFactory(createClass({
 }))
 
 const Feedback = createFactory(createClass({
-  render: function() {
-    return(
-      div({ className: 'columns'},
+  feedbackBtnHandler: function (event) {
+    let feedback = event.target.dataset.feedback
+    browser.runtime.sendMessage({'feedback': feedback})
+    if (feedback === 'page-problem') {
+      this.props.showFeedbackPanel()
+    } else {
+      window.close()
+    }
+  },
+
+  render: function () {
+    return (
+      div({ className: 'columns' },
         a(
           {
             className: 'feedback-btn secondary expanded button',
+            onClick: this.feedbackBtnHandler,
             'data-feedback': 'page-works'
           },
           'This page works well'
@@ -66,6 +77,7 @@ const Feedback = createFactory(createClass({
         a(
           {
             className: 'feedback-btn expanded button',
+            onClick: this.feedbackBtnHandler,
             'data-feedback': 'page-problem'
           },
           'Report a problem'
@@ -76,15 +88,17 @@ const Feedback = createFactory(createClass({
 }))
 
 const Toggle = createFactory(createClass({
-  componentDidUpdate: function() {
+  /*
+  componentDidUpdate: function () {
     if (this.props.disabled) {
       this._input.removeAttribute('checked')
     } else {
       this._input.setAttribute('checked', true)
     }
   },
+  */
 
-  render: function() {
+  render: function () {
     let {disabled, sendToggleMessage} = this.props
     let currentStatus = disabled ? 'disabled' : 'enabled'
     let labelText = 'Blok is ' + currentStatus + ' for this site.'
@@ -125,8 +139,8 @@ const Toggle = createFactory(createClass({
   }
 }))
 
-const MainPanel = createClass({
-  render: function() {
+const MainPanel = createFactory(createClass({
+  render: function () {
     let {disabled, hostReport} = this.props
 
     let title = div({className: 'row'},
@@ -135,15 +149,81 @@ const MainPanel = createClass({
     let report = div({className: 'row'},
       HostReport({ hostReport: hostReport })
     )
-    let feedback = disabled ? null : div({ className: 'row align-center' }, Feedback())
+    let feedback = disabled ? null : div({ className: 'row align-center' }, Feedback({ showFeedbackPanel: this.props.showFeedbackPanel }))
     let toggle = Toggle({ disabled: disabled, sendToggleMessage: sendToggleMessage })
     return div(
       {id: 'main-panel'},
       title, report, feedback, hr(), toggle
     )
   }
+}))
+
+const FeedbackPanel = createClass({
+  render: function () {
+    return div(
+      {id: 'feedback-panel'},
+      div(
+        {className: 'row panel-row'},
+        div(
+          {className: 'small-1 columns feedback-panel-back-arrow'},
+          '\u2329'
+        ),
+        div(
+          {className: 'small-11 columns feedback-panel-form'},
+          div(
+            {className: 'row'},
+            'Thanks! We have noted you saw a problem with this page.'
+          ),
+          div(
+            {className: 'row'},
+            p(
+              {},
+              'Please share any additional information about the problems you see.'
+            ),
+            fieldset(
+              {},
+              legend(
+                {},
+                'I noticed a problem with:'
+              )
+            )
+          )
+        )
+      )
+    )
+  }
 })
 
+const Popup = createClass({
+  getInitialState: function () {
+    return { showFeedbackPanel: false }
+  },
+
+  showFeedbackPanel: function () {
+    this.setState({ showFeedbackPanel: true })
+  },
+
+  render: function () {
+    let {disabled, hostReport, sendToggleMessage} = this.props
+    let mainPanel = null
+    let feedbackPanel = null
+
+    if (this.state.showFeedbackPanel) {
+      feedbackPanel = createElement(FeedbackPanel, {})
+    } else {
+      mainPanel = createElement(MainPanel,
+        {
+          disabled: disabled,
+          hostReport: hostReport,
+          sendToggleMessage: sendToggleMessage,
+          showFeedbackPanel: this.showFeedbackPanel
+        }
+      )
+    }
+
+    return div({}, mainPanel, feedbackPanel)
+  }
+})
 
 function show (querySelector) {
   for (let element of document.querySelectorAll(querySelector)) {
@@ -162,32 +242,7 @@ function showMainPanel () {
   hide('#feedback-panel')
 }
 
-function showFeedbackPanel () {
-  hide('#main-panel')
-  show('#feedback-panel')
-}
-
-function showHostReport (hostReport) {
-  let date = new Date(hostReport.dateTime)
-  let hostReportDateTimeString = days[date.getDay()] + ', ' + months[date.getMonth()] + ' ' + date.getDate()
-  document.querySelector('.host-report-date').innerText = ' on ' + hostReportDateTimeString
-  show('.' + hostReport.feedback + '-host-report')
-  show('.host-report-row')
-}
-
-function setDisabledUI () {
-  hide('.blocking')
-  show('.disabled')
-  document.querySelector('#enabledSwitch').removeAttribute('checked')
-}
-
-function setEnabledUI () {
-  hide('.disabled')
-  show('.blocking')
-  document.querySelector('#enabledSwitch').setAttribute('checked', true)
-}
-
-function sendToggleMessage() {
+function sendToggleMessage () {
   if (disabled) {
     browser.runtime.sendMessage('re-enable')
   } else {
@@ -201,7 +256,7 @@ browser.runtime.getBackgroundPage((bgPage) => {
   let pageHostReport = bgPage.topFrameHostReport
 
   ReactDOM.render(
-    createElement(MainPanel,
+    createElement(Popup,
       {
         disabled: disabled,
         hostReport: pageHostReport,
@@ -211,18 +266,6 @@ browser.runtime.getBackgroundPage((bgPage) => {
     document.getElementById('popup')
   )
 })
-
-for (let feedbackBtn of document.querySelectorAll('.feedback-btn')) {
-  feedbackBtn.addEventListener('click', function (event) {
-    var feedback = event.target.dataset.feedback
-    browser.runtime.sendMessage({'feedback': feedback})
-    if (feedback === 'page-problem') {
-      showFeedbackPanel()
-    } else {
-      window.close()
-    }
-  })
-}
 
 document.querySelector('.feedback-panel-back-arrow').addEventListener('click', () => {
   showMainPanel()
