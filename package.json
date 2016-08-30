@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "bundle": "browserify -d -t envify js/background.js > js/background.bundle.js && browserify -d -t envify js/popup.js > js/popup.bundle.js",
+    "bundle": "browserify -d -t envify js/background.js > js/background.bundle.js && browserify -d -t envify -t [ babelify --presets [ react ] ] js/popup.js > js/popup.bundle.js",
     "build": "npm test && MODE=production npm run bundle && web-ext build",
     "build-dev": "npm test && MODE=dev npm run bundle && web-ext build",
     "coverage": "nyc npm test",
@@ -34,6 +34,8 @@
   },
   "homepage": "https://github.com/mozilla/blok#readme",
   "devDependencies": {
+    "babel-preset-react": "6.11.1",
+    "babelify": "7.3.0",
     "browserify": "13.0.1",
     "coveralls": "2.11.12",
     "envify": "3.4.1",
@@ -41,10 +43,10 @@
     "npm-watch": "0.1.5",
     "nyc": "7.0.0",
     "react": "15.3.1",
+    "react-dom": "15.3.1",
     "standard": "7.1.2",
     "tape": "4.6.0",
-    "web-ext": "1.4.0",
-    "react-dom": "15.3.1"
+    "web-ext": "1.4.0"
   },
   "nyc": {
     "all": true,
