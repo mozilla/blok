@@ -1,9 +1,19 @@
+const {createStore} = require('redux')
+const {wrapStore} = require('react-chrome-redux')
+
+const {activeTabReducer} = require('./reducers')
+
 var {canonicalizeHost} = require('./canonicalize')
 const {loadLists, hostInBlocklist} = require('./lists')
 const {requestAllower, getRequestEntity} = require('./requests')
 const {log} = require('./log')
 
-var currentActiveTabID
+const store = createStore(activeTabReducer)
+
+log('state: ', store.getState())
+
+wrapStore(store, {portName: 'blok'})
+
 var currentOriginDisabledIndex = -1
 window.topFrameHostDisabled = false
 window.topFrameHostReport = {}
@@ -143,12 +153,12 @@ function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, t
   browser.windows.onFocusChanged.addListener((windowID) => {
     log('browser.windows.onFocusChanged, windowID: ' + windowID)
     browser.tabs.query({active: true, windowId: windowID}, (tabsArray) => {
-      currentActiveTabID = tabsArray[0].id
+      store.dispatch({ type: 'SET_ACTIVE_TAB', value: tabsArray[0].id })
     })
   })
 
   browser.tabs.onActivated.addListener(function (activeInfo) {
-    currentActiveTabID = activeInfo.tabId
+    store.dispatch({ type: 'SET_ACTIVE_TAB', value: activeInfo.tabId })
   })
 
   browser.tabs.onUpdated.addListener(function (tabID, changeInfo) {
@@ -167,7 +177,7 @@ function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, t
     if (message === 'disable') {
       let testPilotPingMessage = {
         originDomain: currentActiveOrigin,
-        trackerDomains: blockedRequests[currentActiveTabID],
+        trackerDomains: blockedRequests[store.getState().currentActiveTabID],
         event: 'blok-disabled',
         breakage: '',
         notes: ''
@@ -175,17 +185,17 @@ function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, t
       log('telemetry ping payload: ' + JSON.stringify(testPilotPingMessage))
       testPilotPingChannel.postMessage(testPilotPingMessage)
       browser.pageAction.setIcon({
-        tabId: currentActiveTabID,
+        tabId: store.getState().currentActiveTabID,
         path: 'img/tracking-protection-disabled-16.png'
       })
-      allowedHosts.push(mainFrameOriginTopHosts[currentActiveTabID])
+      allowedHosts.push(mainFrameOriginTopHosts[store.getState().currentActiveTabID])
       browser.storage.local.set({allowedHosts: allowedHosts})
-      browser.tabs.reload(currentActiveTabID)
+      browser.tabs.reload(store.getState().currentActiveTabID)
     }
     if (message === 're-enable') {
       let testPilotPingMessage = {
         originDomain: currentActiveOrigin,
-        trackerDomains: blockedRequests[currentActiveTabID],
+        trackerDomains: blockedRequests[store.getState().currentActiveTabID],
         event: 'blok-enabled',
         breakage: '',
         notes: ''
@@ -193,28 +203,28 @@ function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, t
       log('telemetry ping payload: ' + JSON.stringify(testPilotPingMessage))
       testPilotPingChannel.postMessage(testPilotPingMessage)
       browser.pageAction.setIcon({
-        tabId: currentActiveTabID,
+        tabId: store.getState().currentActiveTabID,
         path: 'img/tracking-protection-16.png'
       })
       allowedHosts.splice(currentOriginDisabledIndex, 1)
       browser.storage.local.set({allowedHosts: allowedHosts})
-      browser.tabs.reload(currentActiveTabID)
+      browser.tabs.reload(store.getState().currentActiveTabID)
     }
     if (message.hasOwnProperty('feedback')) {
       let testPilotPingMessage = {
         originDomain: currentActiveOrigin,
-        trackerDomains: blockedRequests[currentActiveTabID],
+        trackerDomains: blockedRequests[store.getState().currentActiveTabID],
         event: message.feedback,
         breakage: '',
         notes: ''
       }
       log('telemetry ping payload: ' + JSON.stringify(testPilotPingMessage))
       testPilotPingChannel.postMessage(testPilotPingMessage)
-      browser.tabs.sendMessage(currentActiveTabID, {
+      browser.tabs.sendMessage(store.getState().currentActiveTabID, {
         'feedback': message.feedback,
-        'origin': mainFrameOriginTopHosts[currentActiveTabID]
+        'origin': mainFrameOriginTopHosts[store.getState().currentActiveTabID]
       })
-      reportedHosts[mainFrameOriginTopHosts[currentActiveTabID]] = {
+      reportedHosts[mainFrameOriginTopHosts[store.getState().currentActiveTabID]] = {
         'feedback': message.feedback,
         'dateTime': Date.now()
       }
@@ -223,14 +233,14 @@ function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, t
     if (message.hasOwnProperty('breakage')) {
       let testPilotPingMessage = {
         originDomain: currentActiveOrigin,
-        trackerDomains: blockedRequests[currentActiveTabID],
+        trackerDomains: blockedRequests[store.getState().currentActiveTabID],
         event: 'submit',
         breakage: message.breakage,
         notes: message.notes
       }
       log('telemetry ping payload: ' + JSON.stringify(testPilotPingMessage))
       testPilotPingChannel.postMessage(testPilotPingMessage)
-      browser.tabs.sendMessage(currentActiveTabID, message)
+      browser.tabs.sendMessage(store.getState().currentActiveTabID, message)
     }
   })
 }

@@ -1,5 +1,11 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
+const {Provider} = require('react-redux')
+const {Store} = require('react-chrome-redux')
+
+const store = new Store({
+  portName: 'blok'
+})
 
 let disabled = false
 
@@ -104,17 +110,20 @@ const MainPanel = React.createFactory(React.createClass({
   render: function () {
     let {disabled, hostReport} = this.props
     let feedback = null
+    let report = null
 
     let title = (
       <div className='row'>
         <Title disabled={disabled} />
       </div>
     )
-    let report = (
-      <div className='row'>
-        <HostReport hostReport={hostReport} />
-      </div>
-    )
+    if (hostReport) {
+      report = (
+        <div className='row'>
+          <HostReport hostReport={hostReport} />
+        </div>
+      )
+    }
     if (!disabled) {
       feedback = (
         <div className='row align-center'>
@@ -221,8 +230,10 @@ const Popup = React.createClass({
 function sendToggleMessage () {
   if (disabled) {
     browser.runtime.sendMessage('re-enable')
+    store.dispatch({ type: 'ENABLE_BLOCKING' })
   } else {
     browser.runtime.sendMessage('disable')
+    store.dispatch({ type: 'DISABLE_BLOCKING' })
   }
   window.close()
 }
@@ -250,3 +261,11 @@ browser.runtime.getBackgroundPage((bgPage) => {
     document.getElementById('popup')
   )
 })
+/*
+ReactDOM.render(
+  <Provider store={store}>
+    <Popup />
+  </Provider>,
+  document.getElementById('popup')
+)
+*/
