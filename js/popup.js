@@ -1,6 +1,6 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
-const {Provider} = require('react-redux')
+const {Provider, connect} = require('react-redux')
 const {Store} = require('react-chrome-redux')
 
 const store = new Store({
@@ -199,7 +199,13 @@ const FeedbackPanel = React.createClass({
   }
 })
 
-const Popup = React.createClass({
+function mapStateToProps (state) {
+  return {
+    hostReport: state.pageHostReport
+  }
+}
+
+const Popup = connect(mapStateToProps)(React.createClass({
   getInitialState: function () {
     return { showFeedbackPanel: false }
   },
@@ -225,7 +231,7 @@ const Popup = React.createClass({
       )
     }
   }
-})
+}))
 
 function sendToggleMessage () {
   if (disabled) {
@@ -254,18 +260,17 @@ function sendBreakageMessage () {
 
 browser.runtime.getBackgroundPage((bgPage) => {
   disabled = bgPage.topFrameHostDisabled
-  let pageHostReport = bgPage.topFrameHostReport
 
+  ReactDOM.render(
+    <Provider store={store}>
+      <Popup disabled={disabled} sendToggleMessage={sendToggleMessage} sendBreakageMessage={sendBreakageMessage} />
+    </Provider>,
+    document.getElementById('popup')
+  )
+  /*
   ReactDOM.render(
     <Popup disabled={disabled} hostReport={pageHostReport} sendToggleMessage={sendToggleMessage} sendBreakageMessage={sendBreakageMessage} />,
     document.getElementById('popup')
   )
+  */
 })
-/*
-ReactDOM.render(
-  <Provider store={store}>
-    <Popup />
-  </Provider>,
-  document.getElementById('popup')
-)
-*/

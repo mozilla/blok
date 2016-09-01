@@ -10,6 +10,17 @@ const activeTabReducer = function (state = {}, action) {
   }
 }
 
+const hostReportReducer = function (state = {}, action) {
+  log('hostReport reducer was called with ', state, action)
+  switch (action.type) {
+    case 'SET_HOST_REPORT':
+      return Object.assign({}, state, {pageHostReport: action.value})
+    default:
+      return state
+  }
+}
+
 module.exports = {
-  activeTabReducer
+  activeTabReducer,
+  hostReportReducer
 }

@@ -1,7 +1,7 @@
 const {createStore} = require('redux')
 const {wrapStore} = require('react-chrome-redux')
 
-const {activeTabReducer} = require('./reducers')
+const {activeTabReducer, hostReportReducer} = require('./reducers')
 
 var {canonicalizeHost} = require('./canonicalize')
 const {loadLists, hostInBlocklist} = require('./lists')
@@ -75,9 +75,8 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList, reportedHost
         window.topFrameHostDisabled = false
       }
       if (reportedHosts.hasOwnProperty(originTopHost)) {
-        window.topFrameHostReport = reportedHosts[originTopHost]
-      } else {
-        window.topFrameHostReport = {}
+        store.dispatch({ type: 'SET_HOST_REPORT', value: reportedHosts[originTopHost] })
+        // window.topFrameHostReport = reportedHosts[originTopHost]
       }
     }
 
@@ -211,6 +210,12 @@ function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, t
       browser.tabs.reload(store.getState().currentActiveTabID)
     }
     if (message.hasOwnProperty('feedback')) {
+      let hostReport = {
+        'origin': mainFrameOriginTopHosts[store.getState().currentActiveTabID],
+        'feedback': message.feedback,
+        'dateTime': Date.now()
+      }
+      store.dispatch({ type: 'SET_HOST_REPORT', value: hostReport })
       let testPilotPingMessage = {
         originDomain: currentActiveOrigin,
         trackerDomains: blockedRequests[store.getState().currentActiveTabID],

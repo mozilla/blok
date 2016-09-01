@@ -43,7 +43,10 @@
     "npm-watch": "0.1.5",
     "nyc": "7.0.0",
     "react": "15.3.1",
+    "react-chrome-redux": "0.0.8",
     "react-dom": "15.3.1",
+    "react-redux": "4.4.5",
+    "redux": "3.5.2",
     "standard": "7.1.2",
     "tape": "4.6.0",
     "web-ext": "1.4.0"
