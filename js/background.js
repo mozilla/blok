@@ -3,8 +3,11 @@ const {loadLists, hostInBlocklist} = require('./lists')
 const {requestAllower, getRequestEntity} = require('./requests')
 const {log} = require('./log')
 
+// Set some explicit window variable for pageAction to access
 window.topFrameHostDisabled = false
 window.topFrameHostReport = {}
+
+var privateBrowsingMode = false
 var currentActiveTabID
 var currentOriginDisabledIndex = -1
 var currentActiveOrigin
@@ -60,6 +63,10 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
 
     var allowRequest = requestAllower.bind(null, requestTabID, totalExecTime, blockTrackerRequestsStart)
 
+    // allow all requests in private browsing windows
+    if (privateBrowsingMode) {
+      return allowRequest()
+    }
     // undefined origins are browser internals (e.g., about:newtab)
     if (typeof requestDetails.originUrl === 'undefined') {
       return allowRequest()
@@ -152,6 +159,13 @@ function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, t
   )
 
   browser.windows.onFocusChanged.addListener((windowID) => {
+    browser.windows.get(windowID, {}, (focusedWindow) => {
+      if (focusedWindow.incognito) {
+        privateBrowsingMode = true
+      } else {
+        privateBrowsingMode = false
+      }
+    })
     log('browser.windows.onFocusChanged, windowID: ' + windowID)
     browser.tabs.query({active: true, windowId: windowID}, (tabsArray) => {
       let tab = tabsArray[0]
