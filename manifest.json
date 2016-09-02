@@ -32,7 +32,8 @@
   "permissions": [
     "storage",
     "webRequest",
-    "webRequestBlocking"
+    "webRequestBlocking",
+    "tabs"
   ]
 
 }

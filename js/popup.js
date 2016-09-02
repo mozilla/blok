@@ -44,7 +44,7 @@ function setEnabledUI () {
   document.querySelector('#enabledSwitch').setAttribute('checked', true)
 }
 
-browser.runtime.getBackgroundPage((bgPage) => {
+function updateFromBackgroundPage (bgPage) {
   disabled = bgPage.topFrameHostDisabled
   if (disabled) {
     setDisabledUI()
@@ -55,7 +55,7 @@ browser.runtime.getBackgroundPage((bgPage) => {
   if (hostReport.hasOwnProperty('feedback')) {
     showHostReport(hostReport)
   }
-})
+}
 
 document.querySelector('#toggle-blok').addEventListener('click', () => {
   if (disabled) {
@@ -95,3 +95,5 @@ document.querySelector('#submit-btn').addEventListener('click', function () {
     document.querySelector('#breakage-required').className = ''
   }
 })
+
+browser.runtime.getBackgroundPage(updateFromBackgroundPage)

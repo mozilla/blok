@@ -24,6 +24,23 @@ function restartBlokForTab (tabID) {
   mainFrameOriginTopHosts[tabID] = null
 }
 
+function setWindowFrameVarsForPopup (topHost, allowedHosts, reportedHosts) {
+  if (isOriginDisabled(topHost, allowedHosts)) {
+    window.topFrameHostDisabled = true
+  } else {
+    window.topFrameHostDisabled = false
+  }
+  if (reportedHosts.hasOwnProperty(topHost)) {
+    window.topFrameHostReport = reportedHosts[topHost]
+  } else {
+    window.topFrameHostReport = {}
+  }
+}
+
+function isOriginDisabled (host, allowedHosts) {
+  return allowedHosts.indexOf(host) > -1
+}
+
 function blockTrackerRequests (blocklist, allowedHosts, entityList, reportedHosts) {
   return function filterRequest (requestDetails) {
     var blockTrackerRequestsStart = Date.now()
@@ -53,29 +70,23 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList, reportedHost
     currentActiveOrigin = originTopHost
     currentOriginDisabledIndex = allowedHosts.indexOf(currentActiveOrigin)
     flags.currentOriginDisabled = currentOriginDisabledIndex > -1
-    if (requestDetails.frameId === 0) {
-      mainFrameOriginTopHosts[requestTabID] = originTopHost
-      if (flags.currentOriginDisabled) {
-        window.topFrameHostDisabled = true
-        browser.pageAction.setIcon({
-          tabId: requestTabID,
-          path: 'img/tracking-protection-disabled-16.png'
-        })
-      } else {
-        window.topFrameHostDisabled = false
-      }
-      if (reportedHosts.hasOwnProperty(originTopHost)) {
-        window.topFrameHostReport = reportedHosts[originTopHost]
-      } else {
-        window.topFrameHostReport = {}
-      }
-    }
 
     // Allow request originating from Firefox and/or new tab/window origins
     flags.firefoxOrigin = (typeof originTopHost !== 'undefined' && originTopHost.includes('moz-nullprincipal'))
     flags.newOrigin = originTopHost === ''
     if (flags.firefoxOrigin || flags.newOrigin) {
       return allowRequest()
+    }
+
+    // Set main & top frame values if frameId === 0
+    if (requestDetails.frameId === 0) {
+      mainFrameOriginTopHosts[requestTabID] = originTopHost
+      if (flags.currentOriginDisabled) {
+        browser.pageAction.setIcon({
+          tabId: requestTabID,
+          path: 'img/tracking-protection-disabled-16.png'
+        })
+      }
     }
 
     requestTopHost = canonicalizeHost(new URL(requestDetails.url).host)
@@ -143,17 +154,28 @@ function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, t
   browser.windows.onFocusChanged.addListener((windowID) => {
     log('browser.windows.onFocusChanged, windowID: ' + windowID)
     browser.tabs.query({active: true, windowId: windowID}, (tabsArray) => {
-      currentActiveTabID = tabsArray[0].id
+      let tab = tabsArray[0].id
+      currentActiveTabID = tab.id
+      let tabTopHost = canonicalizeHost(new URL(tab.url).host)
+      setWindowFrameVarsForPopup(tabTopHost, allowedHosts, reportedHosts)
     })
   })
 
   browser.tabs.onActivated.addListener(function (activeInfo) {
     currentActiveTabID = activeInfo.tabId
+    browser.tabs.get(currentActiveTabID, function (tab) {
+      let tabTopHost = canonicalizeHost(new URL(tab.url).host)
+      setWindowFrameVarsForPopup(tabTopHost, allowedHosts, reportedHosts)
+    })
   })
 
   browser.tabs.onUpdated.addListener(function (tabID, changeInfo) {
     if (changeInfo.status === 'loading') {
       restartBlokForTab(tabID)
+      browser.tabs.get(currentActiveTabID, function (tab) {
+        let tabTopHost = canonicalizeHost(new URL(tab.url).host)
+        setWindowFrameVarsForPopup(tabTopHost, allowedHosts, reportedHosts)
+      })
     } else if (changeInfo.status === 'complete') {
       let actionRequests = (currentOriginDisabledIndex === -1) ? blockedRequests[tabID] : allowedRequests[tabID]
       let actionEntities = (currentOriginDisabledIndex === -1) ? blockedEntities[tabID] : allowedEntities[tabID]
