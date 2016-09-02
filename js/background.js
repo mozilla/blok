@@ -1,12 +1,12 @@
-var {canonicalizeHost} = require('./canonicalize')
+const {canonicalizeHost} = require('./canonicalize')
 const {loadLists, hostInBlocklist} = require('./lists')
 const {requestAllower, getRequestEntity} = require('./requests')
 const {log} = require('./log')
 
-var currentActiveTabID
-var currentOriginDisabledIndex = -1
 window.topFrameHostDisabled = false
 window.topFrameHostReport = {}
+var currentActiveTabID
+var currentOriginDisabledIndex = -1
 var currentActiveOrigin
 var blockedRequests = {}
 var blockedEntities = {}
@@ -41,7 +41,7 @@ function isOriginDisabled (host, allowedHosts) {
   return allowedHosts.indexOf(host) > -1
 }
 
-function blockTrackerRequests (blocklist, allowedHosts, entityList, reportedHosts) {
+function blockTrackerRequests (blocklist, allowedHosts, entityList) {
   return function filterRequest (requestDetails) {
     var blockTrackerRequestsStart = Date.now()
     var requestTabID = requestDetails.tabId
@@ -146,7 +146,7 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList, reportedHost
 
 function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, testPilotPingChannel) {
   browser.webRequest.onBeforeRequest.addListener(
-    blockTrackerRequests(blocklist, allowedHosts, entityList, reportedHosts),
+    blockTrackerRequests(blocklist, allowedHosts, entityList),
     {urls: ['*://*/*']},
     ['blocking']
   )
@@ -154,7 +154,7 @@ function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, t
   browser.windows.onFocusChanged.addListener((windowID) => {
     log('browser.windows.onFocusChanged, windowID: ' + windowID)
     browser.tabs.query({active: true, windowId: windowID}, (tabsArray) => {
-      let tab = tabsArray[0].id
+      let tab = tabsArray[0]
       currentActiveTabID = tab.id
       let tabTopHost = canonicalizeHost(new URL(tab.url).host)
       setWindowFrameVarsForPopup(tabTopHost, allowedHosts, reportedHosts)
