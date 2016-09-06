@@ -137,10 +137,6 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
       }
 
       totalExecTime[requestTabID] += Date.now() - blockTrackerRequestsStart
-      browser.tabs.sendMessage(requestTabID, {
-        blockedRequests: blockedRequests[requestTabID],
-        blockedEntities: blockedEntities[requestTabID]
-      })
 
       browser.pageAction.show(requestTabID)
       return {cancel: true}
@@ -151,13 +147,15 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
   }
 }
 
-function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, testPilotPingChannel) {
+function startRequestListener (blocklist, allowedHosts, entityList) {
   browser.webRequest.onBeforeRequest.addListener(
     blockTrackerRequests(blocklist, allowedHosts, entityList),
     {urls: ['*://*/*']},
     ['blocking']
   )
+}
 
+function startWindowAndTabListeners (allowedHosts, reportedHosts) {
   browser.windows.onFocusChanged.addListener((windowID) => {
     browser.windows.get(windowID, {}, (focusedWindow) => {
       if (focusedWindow.incognito) {
@@ -198,7 +196,9 @@ function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, t
       log('totalExecTime: ' + totalExecTime[tabID])
     }
   })
+}
 
+function startMessageListener (allowedHosts, reportedHosts, testPilotPingChannel) {
   browser.runtime.onMessage.addListener(function (message) {
     if (message === 'disable') {
       let testPilotPingMessage = {
@@ -246,15 +246,9 @@ function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, t
       }
       log('telemetry ping payload: ' + JSON.stringify(testPilotPingMessage))
       testPilotPingChannel.postMessage(testPilotPingMessage)
-      browser.tabs.sendMessage(currentActiveTabID, {
-        'feedback': message.feedback,
-        'origin': mainFrameOriginTopHosts[currentActiveTabID]
-      })
-      reportedHosts[mainFrameOriginTopHosts[currentActiveTabID]] = {
-        'feedback': message.feedback,
-        'dateTime': Date.now()
-      }
+      reportedHosts[mainFrameOriginTopHosts[currentActiveTabID]] = message
       browser.storage.local.set({reportedHosts: reportedHosts})
+      setWindowFrameVarsForPopup(currentActiveOrigin, allowedHosts, reportedHosts)
     }
     if (message.hasOwnProperty('breakage')) {
       let testPilotPingMessage = {
@@ -266,9 +260,16 @@ function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, t
       }
       log('telemetry ping payload: ' + JSON.stringify(testPilotPingMessage))
       testPilotPingChannel.postMessage(testPilotPingMessage)
-      browser.tabs.sendMessage(currentActiveTabID, message)
     }
   })
+}
+
+function startListeners ({blocklist, allowedHosts, entityList, reportedHosts}, testPilotPingChannel) {
+  startRequestListener(blocklist, allowedHosts, entityList)
+
+  startWindowAndTabListeners(allowedHosts, reportedHosts)
+
+  startMessageListener(allowedHosts, reportedHosts, testPilotPingChannel)
 }
 
 const state = {

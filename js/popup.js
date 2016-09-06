@@ -28,6 +28,7 @@ function showHostReport (hostReport) {
   let date = new Date(hostReport.dateTime)
   let hostReportDateTimeString = days[date.getDay()] + ', ' + months[date.getMonth()] + ' ' + date.getDate()
   document.querySelector('.host-report-date').innerText = ' on ' + hostReportDateTimeString
+  hide('.host-report')
   show('.' + hostReport.feedback + '-host-report')
   show('.host-report-row')
 }
@@ -68,8 +69,13 @@ document.querySelector('#toggle-blok').addEventListener('click', () => {
 
 for (let feedbackBtn of document.querySelectorAll('.feedback-btn')) {
   feedbackBtn.addEventListener('click', function (event) {
-    var feedback = event.target.dataset.feedback
-    browser.runtime.sendMessage({'feedback': feedback})
+    let feedback = event.target.dataset.feedback
+    let hostReport = {
+      'feedback': feedback,
+      'dateTime': Date.now()
+    }
+    showHostReport(hostReport)
+    browser.runtime.sendMessage(hostReport)
     if (feedback === 'page-problem') {
       showFeedbackPanel()
     } else {
