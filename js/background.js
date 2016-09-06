@@ -202,7 +202,7 @@ function startMessageListener (allowedHosts, reportedHosts, testPilotPingChannel
   browser.runtime.onMessage.addListener(function (message) {
     if (message === 'disable') {
       let testPilotPingMessage = {
-        originDomain: currentActiveOrigin,
+        originDomain: mainFrameOriginTopHosts[currentActiveTabID],
         trackerDomains: blockedRequests[currentActiveTabID],
         event: 'blok-disabled',
         breakage: '',
@@ -220,7 +220,7 @@ function startMessageListener (allowedHosts, reportedHosts, testPilotPingChannel
     }
     if (message === 're-enable') {
       let testPilotPingMessage = {
-        originDomain: currentActiveOrigin,
+        originDomain: mainFrameOriginTopHosts[currentActiveTabID],
         trackerDomains: blockedRequests[currentActiveTabID],
         event: 'blok-enabled',
         breakage: '',
@@ -238,7 +238,7 @@ function startMessageListener (allowedHosts, reportedHosts, testPilotPingChannel
     }
     if (message.hasOwnProperty('feedback')) {
       let testPilotPingMessage = {
-        originDomain: currentActiveOrigin,
+        originDomain: mainFrameOriginTopHosts[currentActiveTabID],
         trackerDomains: blockedRequests[currentActiveTabID],
         event: message.feedback,
         breakage: '',
@@ -252,7 +252,7 @@ function startMessageListener (allowedHosts, reportedHosts, testPilotPingChannel
     }
     if (message.hasOwnProperty('breakage')) {
       let testPilotPingMessage = {
-        originDomain: currentActiveOrigin,
+        originDomain: mainFrameOriginTopHosts[currentActiveTabID],
         trackerDomains: blockedRequests[currentActiveTabID],
         event: 'submit',
         breakage: message.breakage,
