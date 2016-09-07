@@ -9,14 +9,15 @@ window.topFrameHostReport = {}
 
 var privateBrowsingMode = false
 var currentActiveTabID
-var currentOriginDisabledIndex = -1
 var currentActiveOrigin
 var blockedRequests = {}
 var blockedEntities = {}
 var allowedRequests = {}
 var allowedEntities = {}
 var totalExecTime = {}
+var mainFrameOriginDisabled = {}
 var mainFrameOriginTopHosts = {}
+var mainFrameOriginDisabledIndex = -1
 
 function restartBlokForTab (tabID) {
   blockedRequests[tabID] = []
@@ -25,6 +26,7 @@ function restartBlokForTab (tabID) {
   allowedEntities[tabID] = []
   totalExecTime[tabID] = 0
   mainFrameOriginTopHosts[tabID] = null
+  mainFrameOriginDisabled[tabID] = false
 }
 
 function setWindowFrameVarsForPopup (topHost, allowedHosts, reportedHosts) {
@@ -53,7 +55,7 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
     var requestEntity
 
     var flags = {
-      currentOriginDisabled: false,
+      mainOriginDisabled: false,
       firefoxOrigin: false,
       newOrigin: false,
       requestHostInBlocklist: false,
@@ -63,86 +65,85 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
 
     var allowRequest = requestAllower.bind(null, requestTabID, totalExecTime, blockTrackerRequestsStart)
 
-    // allow all requests in private browsing windows
     if (privateBrowsingMode) {
+      log('Allowing request in private browsing mode window; PBM TP will catch them.')
       return allowRequest()
     }
-    // undefined origins are browser internals (e.g., about:newtab)
+
     if (typeof requestDetails.originUrl === 'undefined') {
+      log('Allowing request from "undefined" origin - a browser internal origin.')
       return allowRequest()
     }
 
     // Determine all origin flags
     originTopHost = canonicalizeHost(new URL(requestDetails.originUrl).host)
     currentActiveOrigin = originTopHost
-    currentOriginDisabledIndex = allowedHosts.indexOf(currentActiveOrigin)
-    flags.currentOriginDisabled = currentOriginDisabledIndex > -1
 
-    // Allow request originating from Firefox and/or new tab/window origins
     flags.firefoxOrigin = (typeof originTopHost !== 'undefined' && originTopHost.includes('moz-nullprincipal'))
     flags.newOrigin = originTopHost === ''
     if (flags.firefoxOrigin || flags.newOrigin) {
+      log('Allowing request from Firefox and/or new tab/window origins.')
       return allowRequest()
     }
 
     // Set main & top frame values if frameId === 0
     if (requestDetails.frameId === 0) {
       mainFrameOriginTopHosts[requestTabID] = originTopHost
-      if (flags.currentOriginDisabled) {
-        browser.pageAction.setIcon({
-          tabId: requestTabID,
-          path: 'img/tracking-protection-disabled-16.png'
-        })
-      }
+      mainFrameOriginDisabledIndex = allowedHosts.indexOf(originTopHost)
+      mainFrameOriginDisabled[requestTabID] = mainFrameOriginDisabledIndex > -1
     }
 
     requestTopHost = canonicalizeHost(new URL(requestDetails.url).host)
 
+    if (mainFrameOriginDisabled[requestTabID]) {
+      browser.pageAction.setIcon({
+        tabId: requestTabID,
+        path: 'img/tracking-protection-disabled-16.png'
+      })
+      browser.pageAction.show(requestTabID)
+      allowedRequests[requestTabID].push(requestTopHost)
+      /*
+      if (allowedEntities[requestTabID].indexOf(requestEntity.entityName) === -1) {
+        allowedEntities[requestTabID].push(requestEntity.entityName)
+      }
+      */
+      log('Allowing request from origin for which Blok is disabled.')
+      return allowRequest()
+    }
+
     flags.requestHostInBlocklist = hostInBlocklist(blocklist, requestTopHost)
 
-    // Allow requests to 3rd-party domains NOT in the block-list
     if (!flags.requestHostInBlocklist) {
+      log('Allowing request to domain NOT in the block-list.')
+      return allowRequest()
+    }
+
+    requestEntity = getRequestEntity(entityList, originTopHost, requestTopHost, originTopHost)
+    if (requestEntity.sameEntity) {
+      log('Allowing request to block-list domain that belongs to same entity as origin domain.')
       return allowRequest()
     }
 
     flags.requestIsThirdParty = requestTopHost !== originTopHost
 
     if (flags.requestIsThirdParty) {
-      // Allow all requests to the main frame origin domain from child frames' pages
       flags.requestHostMatchesMainFrame = (requestDetails.frameId > 0 && requestTopHost === mainFrameOriginTopHosts[requestTabID])
       if (flags.requestHostMatchesMainFrame) {
-        return allowRequest()
-      }
-      log(`requestTopHost: ${requestTopHost} does not match originTopHost: ${originTopHost}...`)
-
-      requestEntity = getRequestEntity(entityList, originTopHost, requestTopHost, mainFrameOriginTopHosts[requestTabID])
-      if (requestEntity.sameEntity) {
+        log('Allowing request to block-list domain that matches the top/main frame domain.')
         return allowRequest()
       }
 
-      // Allow request if the origin has been added to allowedHosts
-      if (flags.currentOriginDisabled) {
-        log('Protection disabled for this site; allowing request.')
-        allowedRequests[requestTabID].push(requestTopHost)
-        if (allowedEntities[requestTabID].indexOf(requestEntity.entityName) === -1) {
-          allowedEntities[requestTabID].push(requestEntity.entityName)
-        }
-        browser.pageAction.show(requestTabID)
-        return allowRequest()
-      }
-
+      log('Blocking request: originTopHost: ', originTopHost, ' mainFrameOriginTopHost: ', mainFrameOriginTopHosts[requestTabID], ' requestTopHost: ', requestTopHost, ' requestHostInBlocklist: ', flags.requestHostInBlocklist)
       blockedRequests[requestTabID].push(requestTopHost)
       if (blockedEntities[requestTabID].indexOf(requestEntity.entityName) === -1) {
         blockedEntities[requestTabID].push(requestEntity.entityName)
       }
-
       totalExecTime[requestTabID] += Date.now() - blockTrackerRequestsStart
-
       browser.pageAction.show(requestTabID)
       return {cancel: true}
     }
 
-    // none of the above checks matched, so default to allowing the request
+    log('Default to allowing request.')
     return allowRequest()
   }
 }
@@ -169,6 +170,7 @@ function startWindowAndTabListeners (allowedHosts, reportedHosts) {
       let tab = tabsArray[0]
       currentActiveTabID = tab.id
       let tabTopHost = canonicalizeHost(new URL(tab.url).host)
+      mainFrameOriginDisabledIndex = allowedHosts.indexOf(tabTopHost)
       setWindowFrameVarsForPopup(tabTopHost, allowedHosts, reportedHosts)
     })
   })
@@ -177,6 +179,7 @@ function startWindowAndTabListeners (allowedHosts, reportedHosts) {
     currentActiveTabID = activeInfo.tabId
     browser.tabs.get(currentActiveTabID, function (tab) {
       let tabTopHost = canonicalizeHost(new URL(tab.url).host)
+      mainFrameOriginDisabledIndex = allowedHosts.indexOf(tabTopHost)
       setWindowFrameVarsForPopup(tabTopHost, allowedHosts, reportedHosts)
     })
   })
@@ -189,11 +192,13 @@ function startWindowAndTabListeners (allowedHosts, reportedHosts) {
         setWindowFrameVarsForPopup(tabTopHost, allowedHosts, reportedHosts)
       })
     } else if (changeInfo.status === 'complete') {
-      let actionRequests = (currentOriginDisabledIndex === -1) ? blockedRequests[tabID] : allowedRequests[tabID]
-      let actionEntities = (currentOriginDisabledIndex === -1) ? blockedEntities[tabID] : allowedEntities[tabID]
-      log('blocked ' + actionRequests.length + ' requests: ' + actionRequests)
-      log('from ' + actionEntities.length + ' entities: ' + actionEntities)
+      log('******** tab changeInfo.status complete ********')
+      log('blocked ' + blockedRequests[tabID].length + ' requests: ', blockedRequests[tabID])
+      log('from ' + blockedEntities[tabID].length + ' entities: ', blockedEntities[tabID])
+      log('allowed ' + allowedRequests[tabID].length + ' requests: ', allowedRequests[tabID])
+      log('from ' + allowedEntities[tabID].length + ' entities: ', allowedEntities[tabID])
       log('totalExecTime: ' + totalExecTime[tabID])
+      log('******** tab changeInfo.status complete ********')
     }
   })
 }
@@ -201,8 +206,9 @@ function startWindowAndTabListeners (allowedHosts, reportedHosts) {
 function startMessageListener (allowedHosts, reportedHosts, testPilotPingChannel) {
   browser.runtime.onMessage.addListener(function (message) {
     if (message === 'disable') {
+      let mainFrameOriginTopHost = mainFrameOriginTopHosts[currentActiveTabID]
       let testPilotPingMessage = {
-        originDomain: mainFrameOriginTopHosts[currentActiveTabID],
+        originDomain: mainFrameOriginTopHost,
         trackerDomains: blockedRequests[currentActiveTabID],
         event: 'blok-disabled',
         breakage: '',
@@ -214,13 +220,14 @@ function startMessageListener (allowedHosts, reportedHosts, testPilotPingChannel
         tabId: currentActiveTabID,
         path: 'img/tracking-protection-disabled-16.png'
       })
-      allowedHosts.push(mainFrameOriginTopHosts[currentActiveTabID])
+      allowedHosts.push(mainFrameOriginTopHost)
       browser.storage.local.set({allowedHosts: allowedHosts})
       browser.tabs.reload(currentActiveTabID)
     }
     if (message === 're-enable') {
+      let mainFrameOriginTopHost = mainFrameOriginTopHosts[currentActiveTabID]
       let testPilotPingMessage = {
-        originDomain: mainFrameOriginTopHosts[currentActiveTabID],
+        originDomain: mainFrameOriginTopHost,
         trackerDomains: blockedRequests[currentActiveTabID],
         event: 'blok-enabled',
         breakage: '',
@@ -232,7 +239,7 @@ function startMessageListener (allowedHosts, reportedHosts, testPilotPingChannel
         tabId: currentActiveTabID,
         path: 'img/tracking-protection-16.png'
       })
-      allowedHosts.splice(currentOriginDisabledIndex, 1)
+      allowedHosts.splice(mainFrameOriginDisabledIndex, 1)
       browser.storage.local.set({allowedHosts: allowedHosts})
       browser.tabs.reload(currentActiveTabID)
     }
