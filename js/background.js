@@ -94,7 +94,6 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
     }
 
     requestTopHost = canonicalizeHost(new URL(requestDetails.url).host)
-    requestEntity = getRequestEntity(entityList, originTopHost, requestTopHost, originTopHost)
 
     if (mainFrameOriginDisabled[requestTabID]) {
       browser.pageAction.setIcon({
@@ -103,9 +102,11 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
       })
       browser.pageAction.show(requestTabID)
       allowedRequests[requestTabID].push(requestTopHost)
+      /*
       if (allowedEntities[requestTabID].indexOf(requestEntity.entityName) === -1) {
         allowedEntities[requestTabID].push(requestEntity.entityName)
       }
+      */
       log('Allowing request from origin for which Blok is disabled.')
       return allowRequest()
     }
@@ -117,6 +118,7 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
       return allowRequest()
     }
 
+    requestEntity = getRequestEntity(entityList, originTopHost, requestTopHost, originTopHost)
     if (requestEntity.sameEntity) {
       log('Allowing request to block-list domain that belongs to same entity as origin domain.')
       return allowRequest()
