@@ -39,16 +39,15 @@ When the add-on blocks tracker requests, you will see a Tracking Protection page
 
 ### With `web-ext`
 
-1. [Install `web-ext`](https://github.com/mozilla/web-ext/#documentation) if
-   you haven't already
-2. `web-ext run --firefox-binary {path to Firefox 49+ binary}`
+1. `npm install`
+2. `./node_modules/.bin/web-ext run --source-dir=src --firefox-binary {path to Firefox 49+ binary}`
 
 ### Without `web-ext`
 
 1. Go to `about:config` and set `xpinstall.signatures.required` to `false`
 2. Go to `about:debugging`
 3. Click "Load Temporary Add-on"
-4. Select this repo's `manifest.json` file
+4. Select this repo's `src/manifest.json` file
 
 
 ## Testing

@@ -1,5 +1,5 @@
 var test = require('tape')
-var {requestAllower, getRequestEntity} = require('../js/requests')
+var {requestAllower, getRequestEntity} = require('../src/js/requests')
 
 var entityListFixtureData = require('./entitylist-fixture.json')
 
