@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Tracking Protection Experiment",
-  "version": "0.1.14",
+  "version": "1.0rc1",
 
   "description": "Implements tracking protection as a web extension add-on.",
   "icons": {
