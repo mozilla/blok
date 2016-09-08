@@ -6,12 +6,26 @@ hr {
   margin: auto;
 }
 
+p {
+  line-height: 1.44em;
+}
+
 .row {
   padding: .5em;
 }
 
+.row .row {
+  margin: 0;
+}
+
+#main-panel,
+.feedback-panel-form {
+  padding-top: .5em;
+}
+
 .title {
   font-size: 16px;
+  margin-bottom: 0;
 }
 
 .panel-row {
@@ -19,8 +33,8 @@ hr {
 }
 
 .button {
-  border-radius: 5px;
   background-color: #2EA3FF;
+  border-radius: 5px;
 }
 
 .button:focus, .button:hover {
@@ -60,15 +74,57 @@ input:checked ~ .switch-paddle {
 }
 
 .feedback-panel-back-arrow {
-  flex-direction: column;
   background-color: #EBEBEB;
   cursor: pointer;
+  flex-direction: column;
+  position: relative;
+}
+
+.feedback-panel-back-arrow:after {
+  content: '⟨';
+  left: 11px;
+  position: absolute;
+  top: 12px;
 }
 
 #breakage-required {
   color: #ec5840;
 }
 
-.notes-label {
+.host-report > div {
+  font-size: 13px;
+  opacity: .9;
+}
+
+.host-report-date {
+  font-weight: bold;
+}
+
+.radio-form {
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  padding: 5px 10px;
   width: 100%;
+}
+
+.radio-form label {
+  width: 220px;
+}
+
+.notes-label {
+  display: block;
+  font-size: 13px;
+  line-height: 1.44em;
+  margin-bottom: .5rem;
+}
+
+.breakage {
+  margin-bottom: .5em;
+}
+
+#notes {
+  font-size: 13px;
+  resize: none;
+  padding: 5px;
 }

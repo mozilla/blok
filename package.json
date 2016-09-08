@@ -1,5 +1,5 @@
 {
-  "name": "blok",
+  "name": "tracking-protection-experiment",
   "version": "1.0.0",
   "description": "Web Extension implementation of Firefox tracking protection",
   "main": "index.js",
