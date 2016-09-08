@@ -24,12 +24,30 @@ function showFeedbackPanel () {
   show('#feedback-panel')
 }
 
+// grabbed from http://stackoverflow.com/questions/13203518/javascript-date-suffix-formatting
+// for clean date formatting
+// TODO: find an alternate solution if we ever L10N
+function ordinal (date) {
+  if (date > 20 || date < 10) {
+    switch (date % 10) {
+      case 1:
+        return 'st'
+      case 2:
+        return 'nd'
+      case 3:
+        return 'rd'
+    }
+  }
+  return 'th'
+}
+
 function showHostReport (hostReport) {
   let date = new Date(hostReport.dateTime)
-  let hostReportDateTimeString = days[date.getDay()] + ', ' + months[date.getMonth()] + ' ' + date.getDate()
-  document.querySelector('.host-report-date').innerText = ' on ' + hostReportDateTimeString
+  let hostReportDateTimeString = days[date.getDay()] + ', ' + months[date.getMonth()] + ' ' + date.getDate() + ordinal(date.getDate())
+  let hostReportType = '.' + hostReport.feedback + '-host-report'
+  document.querySelector(hostReportType + ' .host-report-date').innerText = ' ' + hostReportDateTimeString
   hide('.host-report')
-  show('.' + hostReport.feedback + '-host-report')
+  show(hostReportType)
   show('.host-report-row')
 }
 
@@ -64,7 +82,10 @@ document.querySelector('#toggle-blok').addEventListener('click', () => {
   } else {
     browser.runtime.sendMessage('disable')
   }
-  window.close()
+  // timeout set so animation completes prior to close
+  setTimeout(() => {
+    window.close()
+  }, 500)
 })
 
 for (let feedbackBtn of document.querySelectorAll('.feedback-btn')) {

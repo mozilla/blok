@@ -12,16 +12,16 @@
     <div id="main-panel">
     <div class="row">
       <div class="columns">
-        <div class="blocking title">Blok is blocking tracker requests on this site.</div>
-        <div class="disabled title hide">Parts of this site may be tracking your activity.</div>
+        <h5 class="blocking title">Tracking Protection is enabled.<br> It is blocking tracker requests on this site.</h5>
+        <h5 class="disabled title hide">Tracking Protection is disabled.<br> Parts of this site may be tracking your activity.</h5>
       </div>
     </div>
     <div class="row host-report-row hide">
       <div class="columns host-report page-problem-host-report hide">
-        You reported a problem on this page<span class="host-report-date"></span>.
+        <div>You reported a problem with this page on<br><span class="host-report-date"></span>.</div>
       </div>
       <div class="columns host-report page-works-host-report hide">
-        You said this page works well<span class="host-report-date"></span>.
+        <div>You said this page works well on<br><span class="host-report-date"></span>.</div>
       </div>
     </div>
     <div class="row align-center">
@@ -35,14 +35,14 @@
     <hr/>
     <div class="row align-middle">
       <div class="small-8 columns toggle-label-column">
-        <span class="blocking">Blok is enabled for this site.</span>
-        <span class="disabled">Blok is disabled for this site.</span>
+        <span class="blocking">Toggle to disable.</span>
+        <span class="disabled">Toggle to enable.</span>
       </div>
       <div class="small-4 columns toggle-column">
         <span class="switch">
           <input class="switch-input" id="enabledSwitch" type="checkbox" name="enabledSwitch" autocomplete="off">
           <label id="toggle-blok" class="switch-paddle" for="enabledSwitch">
-            <span class="show-for-sr">Toggle Blok</span>
+            <span class="show-for-sr">Toggle Tracking Protection</span>
           </label>
         </span>
       </div>
@@ -51,35 +51,33 @@
 
     <div id="feedback-panel" class="hide">
       <div class="row panel-row">
-        <div class="small-1 columns feedback-panel-back-arrow">
-          &lang;
-        </div>
+        <div class="small-1 columns feedback-panel-back-arrow"></div>
         <div class="small-11 columns feedback-panel-form">
           <div class="row">
-            <h5>Thanks! We have noted you saw a problem with this page.</h5>
+            <h5 class="title">We've noted the problem. <br>Thanks for letting us know.</h5>
           </div>
           <div class="row">
-            <p>Please share any additional information about the problems you see.</p>
+            <p>Can you tell us more about your problem with this page?</p>
             <fieldset>
-              <legend>I noticed a problem with: <span id="breakage-required" class="hide">Required</span></legend>
-              <input class="breakage" type="radio" name="breakage" value="images" id="images">
-              <label for="images">Images</label><br>
-              <input class="breakage" type="radio" name="breakage" value="video" id="video">
-              <label for="video">Video</label><br>
-              <input class="breakage" type="radio" name="breakage" value="layout" id="layout">
-              <label for="layout">Layout</label><br>
-              <input class="breakage" type="radio" name="breakage" value="buttons" id="buttons">
-              <label for="buttons">Buttons</label><br>
-              <input class="breakage" type="radio" name="breakage" value="other" id="other">
-              <label for="other">Something else</label><br>
+              <legend class="notes-label">There are problems with: <span id="breakage-required" class="hide">Required</span></legend>
+              <div class="radio-form">
+                <input class="breakage" type="radio" name="breakage" value="images" id="images">
+                <label for="images">Images</label><br>
+                <input class="breakage" type="radio" name="breakage" value="video" id="video">
+                <label for="video">Video</label><br>
+                <input class="breakage" type="radio" name="breakage" value="layout" id="layout">
+                <label for="layout">Layout</label><br>
+                <input class="breakage" type="radio" name="breakage" value="buttons" id="buttons">
+                <label for="buttons">Buttons</label><br>
+                <input class="breakage" type="radio" name="breakage" value="other" id="other">
+                <label for="other">Something else</label><br>
+              </div>
             </fieldset>
           </div>
           <div class="row">
-            <label class="notes-label">
-              Why do you think Blok caused this problem?
+            <label class="notes-label">Why do you think Tracking Protection caused this problem?</label>
               <textarea id="notes" rows="3" maxlength="500" placeholder="500 character limit"></textarea>
-            </label>
-          </div>
+            </div>
           <div class="row">
             <a id="submit-btn" class="expanded button">Submit</a>
           </div>

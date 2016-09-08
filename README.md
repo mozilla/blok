@@ -1,4 +1,5 @@
-# Blok
+# Tracking Protection: Test Pilot Experiment
+## AKA Blok
 
 [![Build Status](https://travis-ci.org/mozilla/blok.svg?branch=master)](https://travis-ci.org/mozilla/blok)
 [![Coverage
@@ -24,7 +25,7 @@ When we have breakage data and user feedback, we will change the tracking protec
 1. [Download the latest `.xpi`](https://github.com/mozilla/blok/tree/master/web-ext-artifacts)
 2. In Firefox, "Open File" and select the `.xpi`
 
-When the add-on blocks tracker requests, you will see a Blok notification bar:
+When the add-on blocks tracker requests, you will see a Tracking Protection pageAction icon:
 
 ![Screenshot](docs/screenshot.png)
 
