@@ -1,5 +1,5 @@
 var test = require('tape')
-var {allHosts, processBlockListJSON, hostInBlocklist, hostInEntity} = require('../js/lists')
+var {allHosts, processBlockListJSON, hostInBlocklist, hostInEntity} = require('../src/js/lists')
 
 var blockListFixtureData = require('./blocklist-fixture.json')
 var entityListFixtureData = require('./entitylist-fixture.json')

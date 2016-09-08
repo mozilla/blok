@@ -7,13 +7,13 @@
     "test": "tests"
   },
   "scripts": {
-    "bundle": "browserify -d -t envify js/background.js > js/background.bundle.js",
-    "build": "npm test && MODE=production npm run bundle && web-ext build",
+    "bundle": "browserify -d -t envify src/js/background.js > src/js/background.bundle.js",
+    "build": "npm test && MODE=production npm run bundle && web-ext build -s src",
     "build-dev": "npm test && MODE=dev npm run bundle && web-ext build",
     "coverage": "nyc npm test",
     "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
     "firefox": "npm run bundle && web-ext run",
-    "lint": "standard && web-ext lint",
+    "lint": "standard && web-ext lint -s src",
     "test": "tape tests/**/*.js | faucet",
     "watch": "npm-watch"
   },
@@ -61,7 +61,7 @@
   "watch": {
     "bundle": {
       "patterns": [
-        "**/*.js"
+        "src/js/*.js"
       ],
       "ignore": "*bundle.js"
     }

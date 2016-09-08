@@ -1,5 +1,5 @@
 var test = require('tape')
-var {canonicalizeHost} = require('../js/canonicalize')
+var {canonicalizeHost} = require('../src/js/canonicalize')
 
 test('canonicalizeHost plain host is plain', function (t) {
   t.plan(1)
