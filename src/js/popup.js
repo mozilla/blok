@@ -2,6 +2,8 @@ let disabled = false
 let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
+let breakageChecked = null
+
 function show (querySelector) {
   for (let element of document.querySelectorAll(querySelector)) {
     element.classList.remove('hide')
@@ -17,11 +19,19 @@ function hide (querySelector) {
 function showMainPanel () {
   show('#main-panel')
   hide('#feedback-panel')
+  hide('#breakage-notes-panel')
 }
 
 function showFeedbackPanel () {
   hide('#main-panel')
   show('#feedback-panel')
+  hide('#breakage-notes-panel')
+}
+
+function showBreakageNotesPanel () {
+  hide('#main-panel')
+  hide('#feedback-panel')
+  show('#breakage-notes-panel')
 }
 
 // grabbed from http://stackoverflow.com/questions/13203518/javascript-date-suffix-formatting
@@ -105,22 +115,38 @@ for (let feedbackBtn of document.querySelectorAll('.feedback-btn')) {
   })
 }
 
-document.querySelector('.feedback-panel-back-arrow').addEventListener('click', () => {
-  showMainPanel()
-})
+for (let backArrow of document.querySelectorAll('.feedback-panel-back-arrow')) {
+  backArrow.addEventListener('click', () => {
+    showMainPanel()
+  })
+}
 
-document.querySelector('#submit-btn').addEventListener('click', function () {
-  let breakageChecked = document.querySelector('input.breakage:checked')
-  if (breakageChecked !== null) {
-    let message = {
-      'breakage': breakageChecked.value,
-      'notes': document.querySelector('textarea#notes').value
+for (let submitBtn of document.querySelectorAll('.submit-btn')) {
+  submitBtn.addEventListener('click', function (ev) {
+    if (ev.target.id === 'submit-breakage-btn') {
+      breakageChecked = document.querySelector('input.breakage:checked')
+      if (breakageChecked !== null) {
+        let message = {
+          'breakage': breakageChecked.value,
+          'notes': document.querySelector('textarea#notes').value
+        }
+        browser.runtime.sendMessage(message)
+        showBreakageNotesPanel()
+      } else {
+        document.querySelector('#breakage-required').className = ''
+      }
+    } else if (ev.target.id === 'submit-notes-btn') {
+      let notes = document.querySelector('textarea#notes').value
+      if (notes !== null) {
+        let message = {
+          'breakage': breakageChecked.value,
+          'notes': notes
+        }
+        browser.runtime.sendMessage(message)
+      }
+      window.close()
     }
-    browser.runtime.sendMessage(message)
-    window.close()
-  } else {
-    document.querySelector('#breakage-required').className = ''
-  }
-})
+  })
+}
 
 browser.runtime.getBackgroundPage(updateFromBackgroundPage)

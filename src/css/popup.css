@@ -1,5 +1,6 @@
 body {
   width: 360px;
+  overflow: hidden;
 }
 
 hr {
@@ -18,7 +19,7 @@ p {
   margin: 0;
 }
 
-#main-panel,
+.main-panel,
 .feedback-panel-form {
   padding-top: .5em;
 }
@@ -28,8 +29,14 @@ p {
   margin-bottom: 0;
 }
 
+.feedback-btn-row {
+  padding-top: 5.25em;
+  padding-bottom: 5.25em;
+}
+
 .panel-row {
   padding: 0;
+  height: 800px;
 }
 
 .button {
