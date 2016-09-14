@@ -116,8 +116,12 @@ for (let feedbackBtn of document.querySelectorAll('.feedback-btn')) {
 }
 
 for (let backArrow of document.querySelectorAll('.feedback-panel-back-arrow')) {
-  backArrow.addEventListener('click', () => {
-    showMainPanel()
+  backArrow.addEventListener('click', (ev) => {
+    if (ev.target.parentElement.parentElement.id === 'breakage-notes-panel') {
+      showFeedbackPanel()
+    } else {
+      showMainPanel()
+    }
   })
 }
 
