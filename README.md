@@ -27,7 +27,12 @@ When we have breakage data and user feedback, we will change the tracking protec
 
 When the add-on blocks tracker requests, you will see a Tracking Protection pageAction icon:
 
-![Screenshot](docs/screenshot.png)
+![pageAction Screenshot](docs/page-action-screenshot.png)
+
+When you click the icon, you will see a pop-up, so you can report
+broken/working pages, or toggle Tracking Protection on or off:
+
+![Pop-up Screenshot](docs/pop-up-screenshot.png)
 
 
 ## Development
