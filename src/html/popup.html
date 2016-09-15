@@ -9,7 +9,7 @@
 
   <body>
 
-    <div id="main-panel">
+    <div id="main-panel" class="main-panel">
     <div class="row">
       <div class="columns">
         <h5 class="blocking title">Tracking Protection is enabled.<br> It is blocking tracker requests on this site.</h5>
@@ -24,7 +24,7 @@
         <div>You said this page works well on<br><span class="host-report-date"></span>.</div>
       </div>
     </div>
-    <div class="row align-center">
+    <div class="row align-center feedback-btn-row">
       <div class="columns">
         <div class="blocking">
           <a class="feedback-btn secondary expanded button" data-feedback="page-works">This page works well</a>
@@ -75,11 +75,25 @@
             </fieldset>
           </div>
           <div class="row">
-            <label class="notes-label">Why do you think Tracking Protection caused this problem?</label>
-              <textarea id="notes" rows="3" maxlength="500" placeholder="500 character limit"></textarea>
-            </div>
+            <a id="submit-breakage-btn" class="expanded button submit-btn">Submit</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="breakage-notes-panel" class="hide">
+      <div class="row panel-row">
+        <div class="small-1 columns feedback-panel-back-arrow"></div>
+        <div class="small-11 columns feedback-panel-form">
           <div class="row">
-            <a id="submit-btn" class="expanded button">Submit</a>
+            <h5 class="title">We've noted the problem. <br>Thanks for letting us know.</h5>
+          </div>
+          <div class="row">
+            <label class="notes-label">Why do you think Tracking Protection caused this problem?</label>
+            <textarea id="notes" rows="7" maxlength="500" placeholder="500 character limit"></textarea>
+          </div>
+          <div class="row">
+            <a id="submit-notes-btn" class="expanded button submit-btn">Submit</a>
           </div>
         </div>
       </div>

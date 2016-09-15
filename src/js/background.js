@@ -193,10 +193,14 @@ function startWindowAndTabListeners (allowedHosts, reportedHosts) {
       })
     } else if (changeInfo.status === 'complete') {
       log('******** tab changeInfo.status complete ********')
-      log('blocked ' + blockedRequests[tabID].length + ' requests: ', blockedRequests[tabID])
-      log('from ' + blockedEntities[tabID].length + ' entities: ', blockedEntities[tabID])
-      log('allowed ' + allowedRequests[tabID].length + ' requests: ', allowedRequests[tabID])
-      log('from ' + allowedEntities[tabID].length + ' entities: ', allowedEntities[tabID])
+      if (blockedRequests[tabID]) {
+        log('blocked ' + blockedRequests[tabID].length + ' requests: ', blockedRequests[tabID])
+        log('from ' + blockedEntities[tabID].length + ' entities: ', blockedEntities[tabID])
+      }
+      if (allowedRequests[tabID]) {
+        log('allowed ' + allowedRequests[tabID].length + ' requests: ', allowedRequests[tabID])
+        log('from ' + allowedEntities[tabID].length + ' entities: ', allowedEntities[tabID])
+      }
       log('totalExecTime: ' + totalExecTime[tabID])
       log('******** tab changeInfo.status complete ********')
     }

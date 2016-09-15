@@ -37,11 +37,11 @@ Blok will use Test Pilot's Telemetry wrapper with no batching of data.  Details
 of when pings are sent are below, along with examples of the `payload` portion
 of a `testpilottest` telemetry ping for each scenario.
 
-* The user clicks "Disable Blok for this site" button in the popup
+* The user clicks the "Toggle to disable" switch in the popup
 
 ```js
   {
-    "originDomain": "www.redditmedia.com",
+    "originDomain": "www.reddit.com",
     "trackerDomains": ["ssl.google-analytics.com",
                        "z.moatads.com"],
     "breakage": "",
@@ -50,11 +50,11 @@ of a `testpilottest` telemetry ping for each scenario.
   }
 ```
 
-* The user clicks "Enable Blok for this site" button in the popup
+* The user clicks "Toggle to enable" switch in the popup
 
 ```js
   {
-    "originDomain": "www.redditmedia.com",
+    "originDomain": "www.reddit.com",
     "trackerDomains": ["ssl.google-analytics.com",
                        "z.moatads.com"],
     "breakage": "",
@@ -89,12 +89,24 @@ of a `testpilottest` telemetry ping for each scenario.
   }
 ```
 
-* The user submits a "breakage report" (which appears after they click the
-  button that the page does not work)
+* The user submits the "There are problems with:" form, which appears after they click the "Report a problem" button
 
 ```js
   {
-    "originDomain": "www.redditmedia.com",
+    "originDomain": "www.reddit.com",
+    "trackerDomains": ["ssl.google-analytics.com",
+                       "z.moatads.com"],
+    "breakage": "layout",  // or "images", "video", "buttons", "other"
+    "notes": "",           // will always be blank from this form
+    "event": "submit"
+  }
+```
+
+* The user submits the "Why do you think Tracking Protection caused this problem?" form, which appears after they submit the "There are problems with:" form
+
+```js
+  {
+    "originDomain": "www.reddit.com",
     "trackerDomains": ["ssl.google-analytics.com",
                        "z.moatads.com"],
     "breakage": "layout",  // or "images", "video", "buttons", "other"
