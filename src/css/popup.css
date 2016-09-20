@@ -19,6 +19,10 @@ p {
   margin: 0;
 }
 
+.panel {
+  height: 100%;
+}
+
 .main-panel,
 .feedback-panel-form {
   padding-top: .5em;
@@ -36,7 +40,7 @@ p {
 
 .panel-row {
   padding: 0;
-  height: 800px;
+  height: 100%;
 }
 
 .button {
@@ -83,15 +87,14 @@ input:checked ~ .switch-paddle {
 .feedback-panel-back-arrow {
   background-color: #EBEBEB;
   cursor: pointer;
+  display: flex;
   flex-direction: column;
-  position: relative;
+  justify-content: center;
+  text-align: center;
 }
 
 .feedback-panel-back-arrow:after {
   content: '⟨';
-  left: 11px;
-  position: absolute;
-  top: 12px;
 }
 
 #breakage-required {
