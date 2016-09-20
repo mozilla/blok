@@ -111,6 +111,11 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
       return allowRequest()
     }
 
+    if (requestDetails.type === 'main_frame') {
+      log('Allowing clicks to links.')
+      return allowRequest()
+    }
+
     flags.requestHostInBlocklist = hostInBlocklist(blocklist, requestTopHost)
 
     if (!flags.requestHostInBlocklist) {
