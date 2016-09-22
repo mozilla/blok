@@ -9,10 +9,10 @@
   "scripts": {
     "bundle": "browserify -d -t envify src/js/background.js > src/js/background.bundle.js",
     "build": "npm test && MODE=production npm run bundle && web-ext build -s src",
-    "build-dev": "npm test && MODE=dev npm run bundle && web-ext build",
+    "build-dev": "npm test && MODE=dev npm run bundle && web-ext build -s src",
     "coverage": "nyc npm test",
     "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
-    "firefox": "npm run bundle && web-ext run",
+    "firefox": "npm run bundle && web-ext run -s src",
     "lint": "standard && web-ext lint -s src",
     "test": "tape tests/**/*.js | faucet",
     "watch": "npm-watch"
