@@ -5,7 +5,8 @@
 
   "description": "Implements tracking protection as a web extension add-on.",
   "icons": {
-    "48": "img/blok.png"
+    "48": "img/blok-48.png",
+    "96": "img/blok-96.png"
   },
 
   "applications": {
