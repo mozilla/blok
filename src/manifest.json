@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Tracking Protection Experiment",
-  "version": "1.0",
+  "version": "1.0.1",
 
   "description": "Implements tracking protection as a web extension add-on.",
   "icons": {
@@ -12,7 +12,8 @@
   "applications": {
     "gecko": {
       "id": "blok@mozilla.org",
-      "strict_min_version": "48.0"
+      "strict_min_version": "48.0",
+      "update_url": "https://testpilot.firefox.com/files/blok/updates.json"
     }
   },
 
