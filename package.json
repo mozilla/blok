@@ -13,7 +13,7 @@
     "coverage": "nyc npm test",
     "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
     "firefox": "npm run bundle && web-ext run",
-    "lint": "standard && web-ext lint -s src",
+    "lint": "standard && web-ext lint --self-hosted -s src",
     "test": "tape tests/**/*.js | faucet",
     "watch": "npm-watch"
   },
