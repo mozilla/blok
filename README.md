@@ -4,6 +4,7 @@
 [![Build Status](https://travis-ci.org/mozilla/blok.svg?branch=master)](https://travis-ci.org/mozilla/blok)
 [![Coverage
 Status](https://coveralls.io/repos/github/mozilla/blok/badge.svg)](https://coveralls.io/github/mozilla/blok)
+[![Available on Test Pilot](https://img.shields.io/badge/available_on-Test_Pilot-0996F8.svg)](https://testpilot.firefox.com/experiments/tracking-protection)
 
 [Web Extension](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/) re-implementation of [Tracking Protection for Firefox](https://support.mozilla.org/en-US/kb/tracking-protection-pbm).
 
