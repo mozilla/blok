@@ -1,54 +1,59 @@
 {
   "name": "tracking-protection-experiment",
-  "version": "1.0.0",
   "description": "Web Extension implementation of Firefox tracking protection",
-  "main": "index.js",
-  "directories": {
-    "test": "tests"
-  },
-  "scripts": {
-    "bundle": "browserify -d -t envify src/js/background.js > src/js/background.bundle.js",
-    "build": "npm test && MODE=production npm run bundle && web-ext build -s src",
-    "build-dev": "npm test && MODE=dev npm run bundle && web-ext build -s src",
-    "coverage": "nyc npm test",
-    "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
-    "firefox": "npm run bundle && web-ext run -s src",
-    "lint": "standard && web-ext lint --self-hosted -s src",
-    "test": "tape tests/**/*.js | faucet",
-    "watch": "npm-watch"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mozilla/blok.git"
-  },
-  "keywords": [
-    "mozilla",
-    "firefox",
-    "tracking protection",
-    "web extension"
-  ],
+  "version": "1.0.0",
   "author": "Luke Crouch",
-  "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/mozilla/blok/issues"
   },
-  "homepage": "https://github.com/mozilla/blok#readme",
+  "dependencies": {
+  },
   "devDependencies": {
     "browserify": "13.0.1",
     "coveralls": "2.11.12",
     "envify": "3.4.1",
     "faucet": "0.0.1",
     "npm-watch": "0.1.5",
+    "nsp": "2.6.1",
     "nyc": "7.0.0",
     "standard": "7.1.2",
     "tape": "4.6.0",
     "web-ext": "1.4.0"
   },
+  "directories": {
+    "test": "tests"
+  },
+  "homepage": "https://github.com/mozilla/blok#readme",
+  "keywords": [
+    "mozilla",
+    "firefox",
+    "tracking protection",
+    "web extension"
+  ],
+  "license": "MPL-2.0",
+  "main": "index.js",
   "nyc": {
     "all": true,
     "exclude": [
       "**/*.bundle.js"
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mozilla/blok.git"
+  },
+  "scripts": {
+    "build": "npm test && MODE=production npm run bundle && web-ext build -s src",
+    "build-dev": "npm test && MODE=dev npm run bundle && web-ext build -s src",
+    "bundle": "browserify -d -t envify src/js/background.js > src/js/background.bundle.js",
+    "coverage": "nyc npm test",
+    "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
+    "firefox": "npm run bundle && web-ext run -s src",
+    "lint": "standard && web-ext lint --self-hosted -s src",
+    "postlint": "nsp check -o summary",
+    "pretest": "npm run lint",
+    "test": "tape tests/**/*.js | faucet",
+    "watch": "npm-watch"
   },
   "standard": {
     "globals": [
