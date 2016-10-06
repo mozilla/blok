@@ -16,12 +16,6 @@ function hide (querySelector) {
   }
 }
 
-function showMainPanel () {
-  show('#main-panel')
-  hide('#feedback-panel')
-  hide('#breakage-notes-panel')
-}
-
 function showFeedbackPanel () {
   hide('#main-panel')
   show('#feedback-panel')
@@ -111,16 +105,6 @@ for (let feedbackBtn of document.querySelectorAll('.feedback-btn')) {
       showFeedbackPanel()
     } else {
       window.close()
-    }
-  })
-}
-
-for (let backArrow of document.querySelectorAll('.feedback-panel-back-arrow')) {
-  backArrow.addEventListener('click', (ev) => {
-    if (ev.target.parentElement.parentElement.id === 'breakage-notes-panel') {
-      showFeedbackPanel()
-    } else {
-      showMainPanel()
     }
   })
 }

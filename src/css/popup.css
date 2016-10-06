@@ -28,6 +28,10 @@ p {
   padding-top: .5em;
 }
 
+.feedback-panel-form fieldset {
+  width: 100%;
+}
+
 .title {
   font-size: 16px;
   margin-bottom: 0;
@@ -82,19 +86,6 @@ input:checked ~ .switch-paddle {
 
 .switch-paddle::after {
   border-radius: 15px;
-}
-
-.feedback-panel-back-arrow {
-  background-color: #EBEBEB;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-}
-
-.feedback-panel-back-arrow:after {
-  content: '⟨';
 }
 
 #breakage-required {
