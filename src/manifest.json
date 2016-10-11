@@ -28,7 +28,8 @@
       "19": "img/tracking-protection-16.png"
     },
     "default_title": "Tracking Protection",
-    "default_popup": "html/popup.html"
+    "default_popup": "html/popup.html",
+    "browser_style": false
   },
 
   "permissions": [
