@@ -248,7 +248,15 @@ function startMessageListener (allowedHosts, reportedHosts, testPilotPingChannel
         tabId: currentActiveTabID,
         path: 'img/tracking-protection-16.png'
       })
-      allowedHosts.splice(mainFrameOriginDisabledIndex, 1)
+
+      // If there are multiple allowedHosts entries for minFrameOriginTopHost somehow,
+      // splice them all out; https://github.com/mozilla/blok/issues/150
+      let lastMainFrameOriginDisabledIndex = allowedHosts.lastIndexOf(mainFrameOriginTopHost)
+      do {
+        mainFrameOriginDisabledIndex = allowedHosts.indexOf(mainFrameOriginTopHost)
+        allowedHosts.splice(mainFrameOriginDisabledIndex, 1)
+        lastMainFrameOriginDisabledIndex = allowedHosts.lastIndexOf(mainFrameOriginTopHost)
+      } while (mainFrameOriginDisabledIndex !== lastMainFrameOriginDisabledIndex)
       browser.storage.local.set({allowedHosts: allowedHosts})
       browser.tabs.reload(currentActiveTabID)
     }
