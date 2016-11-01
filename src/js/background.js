@@ -98,7 +98,10 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
     if (mainFrameOriginDisabled[requestTabID]) {
       browser.pageAction.setIcon({
         tabId: requestTabID,
-        path: 'img/tracking-protection-disabled-16.png'
+        path: {
+          '19': 'img/tracking-protection-disabled-16.png',
+          '38': 'img/tracking-protection-disabled-32.png'
+        }
       })
       browser.pageAction.show(requestTabID)
       allowedRequests[requestTabID].push(requestTopHost)
@@ -227,7 +230,10 @@ function startMessageListener (allowedHosts, reportedHosts, testPilotPingChannel
       testPilotPingChannel.postMessage(testPilotPingMessage)
       browser.pageAction.setIcon({
         tabId: currentActiveTabID,
-        path: 'img/tracking-protection-disabled-16.png'
+        path: {
+          '19': 'img/tracking-protection-disabled-16.png',
+          '38': 'img/tracking-protection-disabled-32.png'
+        }
       })
       allowedHosts.push(mainFrameOriginTopHost)
       browser.storage.local.set({allowedHosts: allowedHosts})
@@ -246,7 +252,10 @@ function startMessageListener (allowedHosts, reportedHosts, testPilotPingChannel
       testPilotPingChannel.postMessage(testPilotPingMessage)
       browser.pageAction.setIcon({
         tabId: currentActiveTabID,
-        path: 'img/tracking-protection-16.png'
+        path: {
+          '19': 'img/tracking-protection-16.png',
+          '38': 'img/tracking-protection-32.png'
+        }
       })
       allowedHosts.splice(mainFrameOriginDisabledIndex, 1)
       browser.storage.local.set({allowedHosts: allowedHosts})
