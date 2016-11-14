@@ -85,7 +85,7 @@ tracking protection users to provide data on problems & breakage, so we
 (Mozilla) can learn how to improve tracking protection technologies in ways
 that maximize user privacy AND minimize web breakage.
 
-The other privacy add-ons are great tools as well. The ability to report
+The other privacy add-ons are great tools as well. The focus on reporting
 website problems & breakages is the key difference here. In fact, we deferred a
 number of other features in favor of simplicity and to make the feedback
 mechanism the primary focus of the add-on.
