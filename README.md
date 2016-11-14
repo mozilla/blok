@@ -78,9 +78,21 @@ To distribute, you will need AMO access credentials. See the `web-ext` docs.
 1. Use [`web-ext
    sign`](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/web-ext_command_reference#web-ext_sign)
 
-## Footnotes, Appendices, etc.
+## FAQ, Footnotes, Appendices, etc.
+#### How does this compare with ublock, privacy badger, ghostery, etc.
+The primary goal of this add-on experiment is to create a feedback loop for
+tracking protection users to provide data on problems & breakage, so we
+(Mozilla) can learn how to improve tracking protection technologies in ways
+that maximize user privacy AND minimize web breakage.
 
-### Running the addon from source without `web-ext`
+The other privacy add-ons are great tools as well. The ability to report
+website problems & breakages is the key difference here. In fact, we deferred a
+number of other features in favor of simplicity and to make the feedback
+mechanism the primary focus of the add-on.
+
+Read more on [the discourse forum](https://discourse.mozilla-community.org/c/test-pilot/tracking-protection).
+
+### How do I run the add-on without `web-ext`
 
 1. Go to `about:config` and set `xpinstall.signatures.required` to `false`
 2. Go to `about:debugging`
