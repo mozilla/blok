@@ -93,7 +93,25 @@ function blockTrackerRequests (blocklist, allowedHosts, entityList) {
       mainFrameOriginDisabled[requestTabID] = mainFrameOriginDisabledIndex > -1
     }
 
-    requestTopHost = canonicalizeHost(new URL(requestDetails.url).host)
+    let requestURL = new URL(requestDetails.url)
+    requestTopHost = canonicalizeHost(requestURL.host)
+
+    // Shim Tealium utag.js functionality to see if shimming even works
+    if (
+        requestTopHost === 'tags.tiqcdn.com' &&
+        requestURL.href.endsWith('utag.js')
+    ) {
+      // Return a no-op shim of utag.js to prevent error while
+      // (maybe) preserving functionality
+      // let utagShimURL = browser.extension.getURL('js/utag-shim.js')
+      let utagShimURL = 'https://groovecoder.github.io/blok/utag-shim.js'
+      log('utagShimURL: ', utagShimURL)
+      let redirect = {
+        redirectUrl: utagShimURL
+      }
+      log('returning: ', redirect)
+      return redirect
+    }
 
     if (mainFrameOriginDisabled[requestTabID]) {
       browser.pageAction.setIcon({

@@ -38,6 +38,10 @@
     "webRequest",
     "webRequestBlocking",
     "tabs"
+  ],
+
+  "web_accessible_resources": [
+    "js/utag-shim.js"
   ]
 
 }
