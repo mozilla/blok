@@ -34,10 +34,12 @@
   },
 
   "permissions": [
+    "experiments.telemetry",
     "storage",
     "webRequest",
     "webRequestBlocking",
-    "tabs"
+    "tabs",
+    "telemetry"
   ]
 
 }

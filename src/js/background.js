@@ -227,6 +227,7 @@ function startMessageListener (allowedHosts, reportedHosts, testPilotPingChannel
         notes: ''
       }
       log('telemetry ping payload: ' + JSON.stringify(testPilotPingMessage))
+      browser.telemetry.event('testpilot.blok', 'popup', 'disable')
       testPilotPingChannel.postMessage(testPilotPingMessage)
       browser.pageAction.setIcon({
         tabId: currentActiveTabID,
