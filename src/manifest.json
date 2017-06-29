@@ -37,7 +37,8 @@
     "storage",
     "webRequest",
     "webRequestBlocking",
-    "tabs"
+    "tabs",
+    "<all_urls>"
   ]
 
 }
