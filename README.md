@@ -8,7 +8,7 @@ Status](https://coveralls.io/repos/github/mozilla/blok/badge.svg)](https://cover
 
 [Web Extension](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/) re-implementation of [Tracking Protection for Firefox](https://support.mozilla.org/en-US/kb/tracking-protection-pbm).
 
-We will run this add-on thru [Test Pilot experimentation](https://testpilot.firefox.com/experiments) to:
+We will run this add-on through [Test Pilot experimentation](https://testpilot.firefox.com/experiments) to:
 
 * Measure web content breakage
 * Collect user feedback
